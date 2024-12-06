@@ -2,6 +2,7 @@
 venv/
 .env/
 *.env
+*.cfg
 
 # Fichiers de configuration spécifiques
 __pycache__/
@@ -46,4 +47,5 @@ Thumbs.db
 # Secret Data
 backend/security_config/secret_data.py
 bin/
-
+lib/
+include/

@@ -8,7 +8,11 @@ from controllers.guest_controller import guest_bp
 from controllers.item_controller import item_bp
 from controllers.assign_controller import assign_bp
 
+from security_config.secret_data import secret_key
+
 app = Flask(__name__)
+app.secret_key = secret_key
+
 CORS(app)  # Pour autoriser les requêtes Cross-Origin
 
 # Enregistrement des Blueprints
