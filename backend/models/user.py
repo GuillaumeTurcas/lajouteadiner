@@ -25,8 +25,6 @@ def create_user(name, surname, login, password, admin):
         print(f"Error create in: {e}")
         return None
 
-
-
 def get_users():
     response = supabase.table("user").select("id", "name", "surname").execute()
     return response.data
@@ -45,11 +43,12 @@ def delete_user(user_id):
 
 def login_user(login, password):
     try:
-        response = supabase.table("users").select("*").eq("login", login).execute()
+        response = supabase.table("user").select("*").eq("login", login).execute()
         if response.data:
             user = response.data[0]
-            if user["password"] == hash_password(password, user["salt"])
+            if user["password"] == hash_password(password, bytes.fromhex(user["salt"])):
                 return get_user(user["id"])
+            print(f"Mot de passe incorrect pour {user["login"]}")
         return None
     except Exception as e:
         print(f"Error logging in: {e}")
@@ -57,11 +56,11 @@ def login_user(login, password):
 
 def change_password(user_id, old_password, new_password):
     try:
-        response = supabase.table("users").select("*").eq("id", user_id).execute()
+        response = supabase.table("user").select("*").eq("id", user_id).execute()
         if response.data:
             user = response.data[0]
-            if user["password"] == hash_password(old_password, user["salt"])
-                hashed_password = hash_password(new_password, user["salt"])
+            if user["password"] == hash_password(old_password, bytes.fromhex(user["salt"])):
+                hashed_password = hash_password(new_password, bytes.fromhex(user["salt"]))
                 supabase.table("users").update({"password": hashed_password}).eq("id", user_id).execute()
                 return True
         return False

@@ -29,3 +29,11 @@ def modify_user(user_id):
 def remove_user(user_id):
     delete_user(user_id)
     return jsonify({"message": "User deleted"}), 200
+
+@user_bp.route("/login", methods=["POST"])
+def login():
+    data = request.json
+    user = login_user(data["login"], data["password"])
+    if user != None:
+        print(f"{user["surname"]} {user["name"]} est connecté")
+    return jsonify(user), 200

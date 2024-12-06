@@ -18,6 +18,14 @@ def list_users():
     response = requests.get(f"{BASE_URL}/users")
     print("Réponse :", response.status_code, response.json())
 
+def login_test():
+    print("=== Test de login ===")
+    login = input("Login : ")
+    password = input("Password : ")
+    log = {"login": login, "password": password}
+    response = requests.post(f"{BASE_URL}/login", json=log)
+    print(f"Réponse :{response.status_code, response.json}")
+
 def update_user():
     print("=== Modifier un utilisateur ===")
     user_id = input("ID de l'utilisateur à modifier : ")
@@ -173,6 +181,8 @@ def main():
         elif choice == "17":
             print("Au revoir!")
             break
+        elif choice == "18":
+            login_test()
         else:
             print("Choix invalide. Essayez à nouveau.")
 
