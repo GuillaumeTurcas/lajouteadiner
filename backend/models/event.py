@@ -17,6 +17,10 @@ def get_events():
     response = supabase.table("event").select("*").execute()
     return response.data
 
+def get_event(event_id):
+    response = supabase.table("event").select("id", event_id).execute()
+    return response.data
+
 # Mettre à jour un événement
 def update_event(event_id, update_data):
     response = supabase.table("event").update(update_data).eq("id", event_id).execute()

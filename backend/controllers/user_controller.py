@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models.user import create_user, get_users, update_user, delete_user
+from models.user import *
 
 user_bp = Blueprint("user", __name__)
 
@@ -13,6 +13,11 @@ def add_user():
 def list_users():
     users = get_users()
     return jsonify(users), 200
+
+@user_bp.route("/users/<int:user_id>", methods=["GET"])
+def get_user_id(user_id):
+    user = get_user(user_id)
+    return jsonify(user), 200
 
 @user_bp.route("/users/<int:user_id>", methods=["PUT"])
 def modify_user(user_id):
