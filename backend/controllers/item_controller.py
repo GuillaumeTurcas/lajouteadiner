@@ -26,7 +26,7 @@ def remove_item(item_id):
     delete_item(item_id)
     return jsonify({"message": "Item deleted"}), 200
 
-@item_bp.route("/items_event/<int: event_id>", methods=["GET"])
+@item_bp.route("/items_event/<int:event_id>", methods=["GET"])
 def items_user(event_id):
  
     items = get_items_event("event_id")
