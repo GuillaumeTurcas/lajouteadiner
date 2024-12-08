@@ -26,3 +26,18 @@ def delete_assign(assign_id):
     response = supabase.table("assign").delete().eq("id", assign_id).execute()
     return response.data
 
+# Obtenir tous les items d'un user pour un event
+def get_assign_user(event_id, user_id):
+    item_ids = [item["id"] for item in supabase.table("item") select \
+            .select("*") \
+            .eq("event", event_id) \
+            .execute().data]
+    return (
+        [] if not item_ids else 
+        supabase.table("assign")
+        .select("*")
+        .in_("item", item_ids)
+        .eq("user", user_id)
+        .execute()
+        .data
+    )

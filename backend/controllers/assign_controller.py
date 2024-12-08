@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models.assign import create_assign, get_assigns, update_assign, delete_assign
+from models.assign import *
 
 assign_bp = Blueprint("assign", __name__)
 
@@ -24,4 +24,11 @@ def modify_assign(assign_id):
 def remove_assign(assign_id):
     delete_assign(assign_id)
     return jsonify({"message": "Assign deleted"}), 200
+
+
+@assign_bp.route("/assign_user", methods=["POST"])
+def assign_user():
+    data = request.json
+    items = get_items_event(data["event_id"], data["user_id"])
+    return jsonify(json.dumps(items)), 200
 

@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
-from models.item import create_item, get_items, update_item, delete_item
+from models.item import *
+import json
 
 item_bp = Blueprint("item", __name__)
 
@@ -24,4 +25,10 @@ def modify_item(item_id):
 def remove_item(item_id):
     delete_item(item_id)
     return jsonify({"message": "Item deleted"}), 200
+
+@item_bp.route("/items_event/<int: event_id>", methods=["GET"])
+def items_user(event_id):
+ 
+    items = get_items_event("event_id")
+    return jsonify(json.dumps(items)), 200
 

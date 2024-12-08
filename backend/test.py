@@ -123,6 +123,14 @@ def delete_assign():
     response = requests.delete(f"{BASE_URL}/assigns/{assign_id}")
     print("Réponse :", response.status_code, response.json())
 
+def item_user():
+    print("=== Obtenez les items d'un user pour un event ===")
+    event_id = int(input("Id event : "))
+    user_id = int(input("Id user "))
+    data = {"event_id": event_id, "user_id": user_id}
+    response = requests.post(f"{BASE_URL}/items_user",json=data)
+    print("Réponse :", response.status_code, response.json())
+
 def main():
     while True:
         print("\n=== Menu ===")
@@ -183,6 +191,8 @@ def main():
             break
         elif choice == "18":
             login_test()
+        elif choice == "19":
+            item_user()
         else:
             print("Choix invalide. Essayez à nouveau.")
 

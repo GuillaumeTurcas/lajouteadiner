@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models.guest import create_guest, get_guests, update_guest, delete_guest
+from models.guest import *
 
 guest_bp = Blueprint("guest", __name__)
 

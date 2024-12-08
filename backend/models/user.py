@@ -41,6 +41,7 @@ def delete_user(user_id):
     response = supabase.table("user").delete().eq("id", user_id).execute()
     return response.data
 
+# Login user
 def login_user(login, password):
     try:
         response = supabase.table("user").select("*").eq("login", login).execute()
@@ -54,6 +55,7 @@ def login_user(login, password):
         print(f"Error logging in: {e}")
         return None
 
+# Changer le password d'un user
 def change_password(user_id, old_password, new_password):
     try:
         response = supabase.table("user").select("*").eq("id", user_id).execute()

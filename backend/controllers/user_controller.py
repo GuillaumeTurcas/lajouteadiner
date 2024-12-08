@@ -37,3 +37,9 @@ def login():
     if user != None:
         print(f"{user["surname"]} {user["name"]} est connecté")
     return jsonify(user), 200
+
+@user_bp.route("/password/<int:user_id>", methods=["POST"])
+def password(user_id):
+    data = request.json
+    response = change_password(user_id, data["old_password"], data["new_password"])
+    return jsonify({"change_password": response}), 200
