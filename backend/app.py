@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_cors import CORS
 
 # Importation des contrôleurs
 from controllers.user_controller import user_bp
@@ -13,7 +12,6 @@ from security_config.secret_data import secret_key
 app = Flask(__name__)
 app.secret_key = secret_key
 
-CORS(app)  # Pour autoriser les requêtes Cross-Origin
 
 # Enregistrement des Blueprints
 app.register_blueprint(user_bp, url_prefix="/api")

@@ -49,3 +49,4 @@ backend/security_config/secret_data.py
 bin/
 lib/
 include/
+lajouteadiner/
