@@ -1,43 +1,79 @@
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
+from flask_restx import Namespace, Resource, fields
 from models.event import *
 
-event_bp = Blueprint("event", __name__)
+# Event namespace
+event_ns = Namespace('events', description='Event related operations')
 
-#CRUD
+# Event model for Swagger documentation
+event_model = event_ns.model('Event', {
+    'event': fields.String(required=True, description='Name of the event'),
+    'date': fields.DateTime(required=True, dt_format='iso8601', description='Date of the event (YYYY-MM-DD)'),
+    'place': fields.String(required=True, description='Place of the event'),
+    'organizer': fields.Integer(required=True, description='Organizer of the event')
+})
 
-@event_bp.route("/events", methods=["POST"])
-def add_event():
-    data = request.json
-    event = create_event(data["event"], data["date"], data["place"], data["organizer"])
-    return jsonify(event), 201
+@event_ns.route('/')
+class EventList(Resource):
+    @event_ns.doc('list_events')
+    def get(self):
+        """List all events"""
+        events = get_events()
+        return jsonify(events)
 
-@event_bp.route("/events", methods=["GET"])
-def list_events():
-    events = get_events()
-    return jsonify(events), 200
+    @event_ns.expect(event_model)
+    @event_ns.doc('add_event')
+    def post(self):
+        """Create a new event"""
+        data = request.json
+        event = create_event(data['event'], data['date'], data['place'], data['organizer'])
+        return jsonify(event)
 
-@event_bp.route("/events/<int:event_id>", methods=["PUT"])
-def modify_event(event_id):
-    data = request.json
-    event = update_event(event_id, data)
-    return jsonify(event), 200
+@event_ns.route('/<int:event_id>')
+@event_ns.param('event_id', 'The event identifier')
+class Event(Resource):
+    @event_ns.expect(event_model)
+    @event_ns.doc('modify_event')
+    def put(self, event_id):
+        """Update an event by ID"""
+        data = request.json
+        event = update_event(event_id, data)
+        return jsonify(event)
 
-@event_bp.route("/events/<int:event_id>", methods=["DELETE"])
-def remove_event(event_id):
-    delete_event(event_id)
-    return jsonify({"message": "Event deleted"}), 200
+    @event_ns.doc('remove_event')
+    def delete(self, event_id):
+        """Delete an event by ID"""
+        delete_event(event_id)
+        return jsonify({'message': 'Event deleted'})
 
-@event_bp.route("/upcoming_events/<int:user_id>", methods=["GET"])
-def list_upcoming_user_events(user_id):
-    events = get_user_upcoming_events(user_id)
-    return jsonify(events), 200
+    @event_ns.doc('list_event')
+    def get(self):
+        """List all events"""
+        events = get_event(event_id)
+        return jsonify(events)
 
-@event_bp.route("/upcoming_events", methods=["GET"])
-def list_upcoming_events(user_id):
-    events = get_upcoming_events()
-    return jsonify(events), 200
+@event_ns.route('/upcoming/<int:user_id>')
+@event_ns.param('user_id', 'The user identifier')
+class UpcomingUserEvents(Resource):
+    @event_ns.doc('list_upcoming_user_events')
+    def get(self, user_id):
+        """List upcoming events for a specific user"""
+        events = get_user_upcoming_events(user_id)
+        return jsonify(events)
 
-@event_bp.route("/events_user/<int:user_id>", methods=["GET"])
-def list_user_events(user_id):
-    events = get_user_events(user_id)
-    return jsonify(events), 200
+@event_ns.route('/upcoming')
+class UpcomingEvents(Resource):
+    @event_ns.doc('list_upcoming_events')
+    def get(self):
+        """List all upcoming events"""
+        events = get_upcoming_events()
+        return jsonify(events)
+
+@event_ns.route('/user/<int:user_id>')
+@event_ns.param('user_id', 'The user identifier')
+class UserEvents(Resource):
+    @event_ns.doc('list_user_events')
+    def get(self, user_id):
+        """List all events for a specific user"""
+        events = get_user_events(user_id)
+        return jsonify(events)
