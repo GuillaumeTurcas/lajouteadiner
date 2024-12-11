@@ -8,6 +8,7 @@
 - **Gestion des utilisateurs** 
 - **Connexion avec Supabase** pour la gestion des données.
 - **API REST** construite avec Flask.
+- **Documentation Swagger** accessible depuis /doc.
 - Gestion sécurisée des données avec un fichier de configuration personnalisé.
 
 ## Prérequis
