@@ -81,7 +81,14 @@ class login(Resource):
 class password(Resource):
     @user_ns.expect(password_model)
     @user_ns.doc('change_password')
-    def post(self, user_id):
+    def put(self, user_id):
         data = request.json
         response = change_password(user_id, data["old_password"], data["new_password"])
+        return jsonify({"change_password": response})
+
+@user_ns.route("/reset_password/<int:user_id>")
+class password(Resource):
+    @user_ns.doc('reset_password')
+    def post(self, user_id):
+        response = reset_password(user_id)
         return jsonify({"change_password": response})

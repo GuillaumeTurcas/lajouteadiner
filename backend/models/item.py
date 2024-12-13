@@ -20,6 +20,7 @@ def create_item(name, quantity, description, event):
         return None
 
 # Lire tous les items
+
 def get_items():
     try:
         response = supabase.table("item").select("*").execute()
@@ -37,6 +38,7 @@ def get_items(item_id):
         return None
 
 # Mettre à jour un item
+
 def update_item(item_id, update_data):
     try:
         response = supabase.table("item").update(update_data).eq("id", item_id).execute()
@@ -44,11 +46,19 @@ def update_item(item_id, update_data):
     except Exception as e:
         print(f"Error update in : {e}")
         return None
-
+a
 # Supprimer un item
+
 def delete_item(item_id):
     try:
-        response = supabase.table("item").delete().eq("id", item_id).execute()
+        assign_delete = supabase.table("assign").select("*") \
+            .eq("item", item_id).execute()
+        if assign_delete.data:
+            [supabase.table("assigne") \
+             .delete().eq("id", assign["id"]).execute() \
+             for assign in assign_delete.data]
+        response = supabase.table("item") \
+            .delete().eq("id", item_id).execute()
         return response.data
     except Exception as e:
         print(f"Error delete in : {e}")

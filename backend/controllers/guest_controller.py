@@ -34,8 +34,8 @@ class Guest(Resource):
     @guest_ns.doc('get_guest')
     def get(self, guest_id):
         """Get a guest by ID"""
-        guests = get_guests(guest_id)
-        return jsonify(guests)
+        guest = get_guest(guest_id)
+        return jsonify(guest)
 
     @guest_ns.expect(guest_model)
     @guest_ns.doc('modify_guest')

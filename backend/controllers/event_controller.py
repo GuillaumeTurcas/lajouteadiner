@@ -47,9 +47,15 @@ class Event(Resource):
         return jsonify({'message': 'Event deleted'})
 
     @event_ns.doc('list_event')
-    def get(self):
-        """List all events"""
+    def get(self, event_id):
+        """List an event"""
         events = get_event(event_id)
+        return jsonify(events)
+
+    @event_ns.doc('list_guest_event')
+    def get(self, event_id):
+        """List all guest for an event"""
+        events = get_users_event(event_id)
         return jsonify(events)
 
 @event_ns.route('/upcoming/<int:user_id>')
@@ -58,7 +64,7 @@ class UpcomingUserEvents(Resource):
     @event_ns.doc('list_upcoming_user_events')
     def get(self, user_id):
         """List upcoming events for a specific user"""
-        events = get_user_upcoming_events(user_id)
+        events = get_upcoming_events_user(user_id)
         return jsonify(events)
 
 @event_ns.route('/upcoming')
@@ -75,5 +81,5 @@ class UserEvents(Resource):
     @event_ns.doc('list_user_events')
     def get(self, user_id):
         """List all events for a specific user"""
-        events = get_user_events(user_id)
+        events = get_events_user(user_id)
         return jsonify(events)

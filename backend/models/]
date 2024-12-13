@@ -63,10 +63,10 @@ def delete_event(event_id):
     try:
         guest_delete = supabase.table("guest") \
             .select("*").eq("event", event_id).execute().data
-        if guest_delete:
+        if guest_delete.data:
             [supabase.table("guest")
-                .delete().eq("id", int(guest["id"])).execute() \
-                for guest in guest_delete]
+                .delete().eq("id", int(guest["id"])) \
+                for guest in guest_delete.data]
         item_delete = supabase.table("item") \
             .select("*").eq("event", event_id).execute().data
         if item_delete:

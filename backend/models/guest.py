@@ -19,16 +19,17 @@ def create_guest(user, event, role):
 def get_guests():
     try:
         response = supabase.table("guest").select("*").execute()
+        print(response.data)
         return response.data
     except Exception as e:
         print(f"Error get in : {e}")
         return None
 
 # Lire un invité
-def get_guests(guest_id):
+def get_guest(guest_id):
     try:
         response = supabase.table("guest").select("*").eq("id", guest_id).execute()
-        return response.data
+        return response.data[0]
     except Exception as e:
         print(f"Error get in : {e}")
         return None
