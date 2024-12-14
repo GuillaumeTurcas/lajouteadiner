@@ -8,8 +8,7 @@ guest_ns = Namespace('guests', description='Guest related operations')
 # Guest model for Swagger documentation
 guest_model = guest_ns.model('Guest', {
     'user': fields.Integer(required=True, description='User ID of the guest'),
-    'event': fields.Integer(required=True, description='Event ID the guest is assigned to'),
-    'role': fields.String(required=True, description='Role of the guest in the event')
+    'event': fields.Integer(required=True, description='Event ID the guest is assigned to')
 })
 
 @guest_ns.route('/')
@@ -25,7 +24,7 @@ class GuestList(Resource):
     def post(self):
         """Create a new guest"""
         data = request.json
-        guest = create_guest(data['user'], data['event'], data['role'])
+        guest = create_guest(data['user'], data['event'])
         return jsonify(guest)
 
 @guest_ns.route('/<int:guest_id>')
@@ -37,12 +36,10 @@ class Guest(Resource):
         guest = get_guest(guest_id)
         return jsonify(guest)
 
-    @guest_ns.expect(guest_model)
-    @guest_ns.doc('modify_guest')
-    def put(self, guest_id):
-        """Update a guest by ID"""
-        data = request.json
-        guest = update_guest(guest_id, data)
+    @guest_ns.doc('accept_guest')
+    def post(self, guest_id):
+        """A guest change his decision to go to an event"""
+        guest = accept_guest(guest_id)
         return jsonify(guest)
 
     @guest_ns.doc('remove_guest')

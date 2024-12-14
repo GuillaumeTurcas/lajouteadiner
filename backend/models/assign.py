@@ -5,6 +5,9 @@ supabase = get_supabase_client()
 # Créer une assignation
 def create_assign(user, item, quantity):
     try:
+        if verif_quantity(item, int(quantity)):
+            print("Too much quantity")
+            return None
         response = supabase.table("assign").insert({
             "user": user,
             "item": item,
@@ -27,6 +30,12 @@ def get_assigns():
 # Mettre à jour une assignation
 def update_assign(assign_id, update_data):
     try:
+        if update_data["quantity"]:
+            verif_assign_update = supabase.table("assign") \
+                .select("*").eq("id", assign_id).execute().data[0]["quantity"]
+            if verif_assign(item, update["quantity"] - verif_assign_update):
+                print("Too much quantity")
+                return None
         response = supabase.table("assign").update(update_data).eq("id", assign_id).execute()
         return response.data
     except Exception as e:
@@ -62,3 +71,15 @@ def get_assign_user(event_id, user_id):
         print(f"Error get in : {e}")
         return None
 
+def verif_quantity(item_id, quantity_assign):
+    try:
+        quantity = supabase.table("item") \
+            .select("*").eq("id", item_id).execute().data[0]["quantity"]
+        verif_assign = supabase.table("assign") \
+            .select("*").eq("item", item_id).execute().data
+        for assign in verif_assign:
+            quantity_assign += assign["quantity"]
+        return quantity_assign > quantity
+    except Exception as e:
+        print(f"Error get in : {e}")
+        return None

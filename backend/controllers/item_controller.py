@@ -23,7 +23,7 @@ class ItemList(Resource):
     def get(self):
         """List all items"""
         items = get_items()
-        return jsonify(items), 200
+        return jsonify(items)
 
     @item_ns.expect(item_model)
     @item_ns.doc('add_item')
@@ -31,7 +31,7 @@ class ItemList(Resource):
         """Create a new item"""
         data = request.json
         item = create_item(data['name'], data['quantity'], data['description'], data['event'])
-        return jsonify(item), 201
+        return jsonify(item)
 
 @item_ns.route('/<int:item_id>')
 @item_ns.param('item_id', 'The item identifier')
@@ -42,14 +42,13 @@ class Item(Resource):
         """Update an item by ID"""
         data = request.json
         item = update_item(item_id, data)
-        return jsonify(item), 200
+        return jsonify(item)
 
     @item_ns.doc('remove_item')
     def delete(self, item_id):
         """Delete an item by ID"""
         delete_item(item_id)
-        return jsonify({'message': 'Item deleted'}), 200
-
+        return jsonify({'message': 'Item deleted'})
 @item_ns.route('/event/<int:event_id>')
 @item_ns.param('event_id', 'The event identifier')
 class ItemsByEvent(Resource):
@@ -57,4 +56,4 @@ class ItemsByEvent(Resource):
     def get(self, event_id):
         """List items by event ID"""
         items = get_items_event(event_id)
-        return jsonify(json.dumps(items)), 200
+        return jsonify(json.dumps(items))

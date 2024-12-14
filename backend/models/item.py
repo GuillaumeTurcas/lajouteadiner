@@ -2,6 +2,7 @@ from config import get_supabase_client
 
 from models.user import *
 from models.event import *
+from models.assign import *
 
 supabase = get_supabase_client()
 
@@ -41,12 +42,22 @@ def get_items(item_id):
 
 def update_item(item_id, update_data):
     try:
-        response = supabase.table("item").update(update_data).eq("id", item_id).execute()
-        return response.data
+        try:
+            if update_data["quantity"]:
+                init_quantity = supabase.table("item").select("*") \
+                    .eq("id", item_id).execute().data[0]["quantity"]
+                if verif_quantity(item_id, init_quantity - update_data["quantity"]):
+                    print("Quantity too low")
+                    return None
+            response = supabase.table("item").update(update_data).eq("id", item_id).execute()
+            return response.data
+        except:
+            response = supabase.table("item").update(update_data).eq("id", item_id).execute()
+            return response.data
     except Exception as e:
         print(f"Error update in : {e}")
         return None
-a
+
 # Supprimer un item
 
 def delete_item(item_id):

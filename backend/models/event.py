@@ -50,6 +50,24 @@ def get_event(event_id):
 
 def update_event(event_id, update_data):
     try:
+        verif_organizer = supabase.table("event").select("*").eq(
+            "id", event_id).execute().data[0]["organizer"]
+        guest_event = supabase.table("event") \
+            .select("*, guest!inner(user)") \
+            .eq("guest.user", user_id) \
+            .execute()
+        add_organizer_in_guest_list = False
+        if update_data:
+            if update_data["organizer"] != verif_organizer :
+                add_organizer_in_guest_list = True
+                for guest in guest_event:
+                    if guest["user"] == update_data["organizer"]:
+                        add_organizer_in_guest_list = False
+        change_organizer = supabase.table("guest").insert({
+                "user": update_data["organizer"],
+                "event": event_id,
+                "accept": True
+            }).execute() if add_organizer_in_guest_list else False
         response = supabase.table("event").update(
             update_data).eq("id", event_id).execute()
         return response.data

@@ -3,12 +3,19 @@ from config import get_supabase_client
 supabase = get_supabase_client()
 
 # Ajouter un invité
-def create_guest(user, event, role):
+def create_guest(user, event):
     try:
+        verif_guest = supabase.table("guest") \
+            .select("*").execute().data
+        if verif_guest:
+            for guest in verif_guest:
+                if guest["user"] == user and guest["event"] == event:
+                    print("guest already exist")
+                    return None
         response = supabase.table("guest").insert({
             "user": user,
             "event": event,
-            "role": role
+            "accept": False
         }).execute()
         return response.data
     except Exception as e:
@@ -28,20 +35,23 @@ def get_guests():
 # Lire un invité
 def get_guest(guest_id):
     try:
-        response = supabase.table("guest").select("*").eq("id", guest_id).execute()
+        response = supabase.table("guest") \
+            .select("*").eq("id", guest_id).execute()
         return response.data[0]
     except Exception as e:
         print(f"Error get in : {e}")
         return None
 
-# Mettre à jour un invité
-def update_guest(guest_id, update_data):
+def accept_guest(guest_id):
     try:
-        response = supabase.table("guest").update(update_data).eq("id", guest_id).execute()
+        change_accept = supabase.table("guest").select("*").eq("id", guest_id) \
+            .execute().data[0]
+        change_accept["accept"] = False if change_accept["accept"] else True
+        response = supabase.table("guest") \
+            .update(change_accept).eq("id", guest_id).execute()
         return response.data
     except Exception as e:
         print(f"Error update in : {e}")
-        return None
 
 # Supprimer un invité
 def delete_guest(guest_id):
