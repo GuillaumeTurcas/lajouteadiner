@@ -55,7 +55,7 @@ class Event(Resource):
     @event_ns.doc('list_guest_event')
     def get(self, event_id):
         """List all guest for an event"""
-        events = get_users_event(event_id)
+        events = get_guests_event(event_id)
         return jsonify(events)
 
 @event_ns.route('/upcoming/<int:user_id>')

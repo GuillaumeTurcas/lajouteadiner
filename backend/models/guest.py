@@ -92,20 +92,6 @@ def delete_guest(guest_id):
         print(f"Error deleting guest: {e}")
         return None
 
-# Récupérer tous les invités d'un événement
-def get_guests_by_event(event_id):
-    """
-    Récupère tous les invités associés à un événement spécifique.
-
-    :param event_id: ID de l'événement
-    :return: Liste des invités de l'événement ou None en cas d'erreur
-    """
-    try:
-        response = supabase.table("guest").select("*").eq("event", event_id).execute()
-        return response.data
-    except Exception as e:
-        print(f"Error retrieving guests for event: {e}")
-        return None
 
 # Obtenir tous les items d'un invité pour un événement
 def items_for_a_guest(guest_id):

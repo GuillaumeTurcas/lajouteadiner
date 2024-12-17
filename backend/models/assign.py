@@ -1,7 +1,5 @@
 from config import get_supabase_client
-from models.item import *
 from models.event import *
-from models.guest import *
 
 # Initialisation du client Supabase
 supabase = get_supabase_client()
@@ -84,7 +82,7 @@ def update_assign(assign_id, update_data):
 
         # Si un changement de "guest" est requis
         if "guest" in update_data:
-            guest_event = get_guests_by_event(event_id)
+            guest_event = get_guests_event(event_id)
             guest_in_event = False
             for guest in guest_event:
                 if update_data["guest"] == guest["id"]:

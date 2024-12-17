@@ -7,7 +7,7 @@ supabase = get_supabase_client()
 # Créer un événement
 def create_event(event, date, place, organizer):
     """
-    Crée un nouvel événement dans la table "event" et ajoute l'organisateur comme invité.
+    Crée un nouvel événement dans la table "event" et ajoute l'organisateur comme guest.
 
     :param event: Nom de l'événement
     :param date: Date de l'événement
@@ -25,7 +25,7 @@ def create_event(event, date, place, organizer):
         supabase.table("guest").insert({
             "user": response.data[0]["organizer"],
             "event": response.data[0]["id"],
-            "role": "organizer"
+            "accept": True
         }).execute()
         return response.data[0]
     except Exception as e:
@@ -107,7 +107,7 @@ def delete_event(event_id):
         return None
 
 # Lire tous les invités d'un événement
-def get_users_event(event_id):
+def get_guests_event(event_id):
     """
     Récupère tous les invités d'un événement spécifique.
 
@@ -115,7 +115,7 @@ def get_users_event(event_id):
     :return: Liste des invités ou None en cas d'erreur
     """
     try:
-        response = supabase.table("guest").select("user").eq("event", event_id).execute()
+        response = supabase.table("guest").select("*").eq("event", event_id).execute()
         return response.data
     except Exception as e:
         print(f"Error retrieving event users: {e}")

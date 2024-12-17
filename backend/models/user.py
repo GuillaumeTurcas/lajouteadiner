@@ -76,6 +76,8 @@ def update_user(user_id, update_data):
     :return: Données mises à jour ou None en cas d'erreur
     """
     try:
+        if "password" in update_data:
+            del update_data["password"]
         response = supabase.table("user").update(update_data).eq("id", user_id).execute()
         return response.data
     except Exception as e:

@@ -13,6 +13,13 @@ user_model = user_ns.model('User', {
     'admin': fields.Integer(required=True, description='Whether the user is an admin')
 })
 
+edit_user_model = user_ns.model('User', {
+    'name': fields.String(required=True, description='First name of the user'),
+    'surname': fields.String(required=True, description='Last name of the user'),
+    'login': fields.String(required=True, description='Login identifier of the user'),
+    'admin': fields.Integer(required=True, description='Whether the user is an admin')
+})
+
 
 login_model = user_ns.model('Login', {
     'login': fields.String(required=True, description='Login identifier of the user'),
@@ -49,7 +56,7 @@ class User(Resource):
         user = get_user(user_id)
         return jsonify(user)
 
-    @user_ns.expect(user_model)
+    @user_ns.expect(edit_user_model)
     @user_ns.doc('modify_user')
     def put(self, user_id):
         """Update a user by ID"""
