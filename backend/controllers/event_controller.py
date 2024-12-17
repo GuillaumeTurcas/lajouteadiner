@@ -27,7 +27,6 @@ class EventList(Resource):
     @event_ns.expect(event_model)
     @event_ns.doc('add_event')
     @login_required
-    @login_required
     def post(self):
         """Create a new event"""
         data = request.json

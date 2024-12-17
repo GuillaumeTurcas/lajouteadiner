@@ -166,10 +166,10 @@ def retrieve_guest(kwargs):
     Récupère un invité à partir des paramètres fournis.
     """
     if "guest_id" in kwargs:
-        return get_guest(kwargs["guest_id"])
+        return get_guest(kwargs["guest_id"])[0]
     if "assign_id" in kwargs:
         assign = get_assign(kwargs["assign_id"])
-        return get_guest(assign["guest_id"])
+        return get_guest(assign["guest_id"])[0]
     raise ValueError("Impossible de retrouver l'invité")
 
 
@@ -178,11 +178,11 @@ def retrieve_event_from_data(data):
     Récupère un événement à partir des données fournies.
     """
     if "event" in data:
-        return get_event(data["event"])
+        return get_event(data["event"])[0]
     if "guest" in data:
         guest = get_guest(data["guest"])
-        return get_event(guest["event_id"])
+        return get_event(guest["event_id"])[0]
     if "item" in data:
         item = get_item(data["item"])
-        return get_event(item["event_id"])
+        return get_event(item["event_id"])[0]
     return None
