@@ -47,3 +47,11 @@ class Guest(Resource):
         """Delete a guest by ID"""
         delete_guest(guest_id)
         return jsonify({'message': 'Guest deleted'})
+
+@guest_ns.route('/items_for_a_guest/<int:guest_id>')
+class Assign(Resource):
+    @guest_ns.doc('items_for_a_guest')
+    def get(self, guest_id):
+        """Update an assignment by ID"""
+        items = items_for_a_guest(guest_id)
+        return jsonify(assign)

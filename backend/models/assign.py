@@ -1,85 +1,143 @@
 from config import get_supabase_client
+from models.item import *
+from models.event import *
+from models.guest import *
 
+# Initialisation du client Supabase
 supabase = get_supabase_client()
 
 # Créer une assignation
-def create_assign(user, item, quantity):
+def create_assign(guest, item, quantity):
+    """
+    Crée une assignation entre un invité et un item avec une quantité spécifiée.
+
+    :param guest: ID de l'invité
+    :param item: ID de l'item
+    :param quantity: Quantité assignée
+    :return: Données de l'assignation créée ou message d'erreur
+    """
     try:
         if verif_quantity(item, int(quantity)):
             print("Too much quantity")
             return None
-        response = supabase.table("assign").insert({
-            "user": user,
-            "item": item,
-            "quantity": quantity
-        }).execute()
-        return response.data
+        guest_data = supabase.table("guest").select("*").eq("id", guest).execute().data[0]
+        item_data = supabase.table("item").select("*").eq("id", item).execute().data[0]
+        if guest_data["event"] == item_data["event"]:
+            response = supabase.table("assign").insert({
+                "guest": guest,
+                "item": item,
+                "quantity": quantity
+            }).execute()
+            return response.data
+        else:
+            return {
+                "request_status": "Failed",
+                "reason": "Item and guest aren't for the same event"
+            }
     except Exception as e:
-        print(f"Error get in : {e}")
+        print(f"Error creating assign: {e}")
         return None
 
 # Lire toutes les assignations
 def get_assigns():
+    """
+    Récupère toutes les assignations.
+
+    :return: Liste des assignations ou None en cas d'erreur
+    """
     try:
         response = supabase.table("assign").select("*").execute()
         return response.data
     except Exception as e:
-        print(f"Error get in : {e}")
+        print(f"Error retrieving assigns: {e}")
+        return None
+
+# Lire une assignation par son ID
+def get_assign(assign_id):
+    """
+    Récupère une assignation spécifique par son ID.
+
+    :param assign_id: ID de l'assignation
+    :return: Données de l'assignation ou None en cas d'erreur
+    """
+    try:
+        response = supabase.table("assign").select("*").eq("id", assign_id).execute().data[0]
+        return response
+    except Exception as e:
+        print(f"Error retrieving assign: {e}")
         return None
 
 # Mettre à jour une assignation
 def update_assign(assign_id, update_data):
+    """
+    Met à jour une assignation avec les nouvelles données fournies.
+
+    :param assign_id: ID de l'assignation
+    :param update_data: Dictionnaire des champs à mettre à jour
+    :return: Données mises à jour ou None en cas d'erreur
+    """
     try:
-        if update_data["quantity"]:
-            verif_assign_update = supabase.table("assign") \
-                .select("*").eq("id", assign_id).execute().data[0]["quantity"]
-            if verif_assign(item, update["quantity"] - verif_assign_update):
+        # Récupérer les données existantes de l'assignation
+        assign = supabase.table("assign").select("*").eq("id", assign_id).execute().data[0]
+        item_id = assign["item"]
+        event_id = supabase.table("item").select("event").eq("id", item_id).execute().data[0]["event"]
+
+        # Si un changement de "guest" est requis
+        if "guest" in update_data:
+            guest_event = get_guests_by_event(event_id)
+            guest_in_event = False
+            for guest in guest_event:
+                if update_data["guest"] == guest["id"]:
+                    guest_in_event = True
+            if guest_in_event == False:
+                print("Guest is not part of the event")
+                return None
+
+        # Vérifier la quantité si elle est cohérente
+        if "quantity" in update_data:
+            current_quantity = assign["quantity"]
+            new_quantity = update_data["quantity"]
+            if verif_quantity(item_id, new_quantity - current_quantity):
                 print("Too much quantity")
                 return None
+
+        # Effectuer la mise à jour
         response = supabase.table("assign").update(update_data).eq("id", assign_id).execute()
         return response.data
     except Exception as e:
-        print(f"Error update in : {e}")
+        print(f"Error updating assign: {e}")
         return None
 
 # Supprimer une assignation
 def delete_assign(assign_id):
+    """
+    Supprime une assignation spécifique.
+
+    :param assign_id: ID de l'assignation à supprimer
+    :return: Données supprimées ou None en cas d'erreur
+    """
     try:
         response = supabase.table("assign").delete().eq("id", assign_id).execute()
         return response.data
     except Exception as e:
-        print(f"Error delete in : {e}")
+        print(f"Error deleting assign: {e}")
         return None
 
-# Obtenir tous les items d'un user pour un event
-def get_assign_user(event_id, user_id):
-    try:
-        item_ids = [item["id"] for item in supabase.table("item") \
-                .select("*") \
-                .eq("event", event_id) \
-                .execute().data]
-        return (
-            [] if not item_ids else 
-            supabase.table("assign")
-            .select("*")
-            .in_("item", item_ids)
-            .eq("user", user_id)
-            .execute()
-            .data
-        )
-    except Exception as e:
-        print(f"Error get in : {e}")
-        return None
-
+# Vérifier la quantité d'un item pour une assignation
 def verif_quantity(item_id, quantity_assign):
+    """
+    Vérifie si la quantité totale assignée dépasse la quantité disponible pour un item.
+
+    :param item_id: ID de l'item
+    :param quantity_assign: Quantité à vérifier
+    :return: True si la quantité dépasse, sinon False
+    """
     try:
-        quantity = supabase.table("item") \
-            .select("*").eq("id", item_id).execute().data[0]["quantity"]
-        verif_assign = supabase.table("assign") \
-            .select("*").eq("item", item_id).execute().data
+        quantity = supabase.table("item").select("*").eq("id", item_id).execute().data[0]["quantity"]
+        verif_assign = supabase.table("assign").select("*").eq("item", item_id).execute().data
         for assign in verif_assign:
             quantity_assign += assign["quantity"]
         return quantity_assign > quantity
     except Exception as e:
-        print(f"Error get in : {e}")
+        print(f"Error verifying quantity: {e}")
         return None
