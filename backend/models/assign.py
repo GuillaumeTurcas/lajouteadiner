@@ -12,7 +12,7 @@ def create_assign(guest, item, quantity):
     :param guest: ID de l'invité
     :param item: ID de l'item
     :param quantity: Quantité assignée
-    :return: Données de l'assignation créée ou message d'erreur
+    :return: Données de l'assignation créée ou None en cas d'erreur
     """
     try:
         if verif_quantity(item, int(quantity)):
@@ -28,10 +28,7 @@ def create_assign(guest, item, quantity):
             }).execute()
             return response.data
         else:
-            return {
-                "request_status": "Failed",
-                "reason": "Item and guest aren't for the same event"
-            }
+            return None
     except Exception as e:
         print(f"Error creating assign: {e}")
         return None

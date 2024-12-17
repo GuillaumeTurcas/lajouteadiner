@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restx import Api
 
+
 # Importation des contrôleurs
 from controllers.user_controller import user_ns
 from controllers.event_controller import event_ns

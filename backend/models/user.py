@@ -2,6 +2,7 @@ import os
 from config import get_supabase_client
 from security_config.hash_password import hash_password
 from security_config.secret_data import default_password
+from auth import *
 
 # Initialisation du client Supabase
 supabase = get_supabase_client()
@@ -28,7 +29,7 @@ def create_user(name, surname, login, password, admin):
             "surname": surname,
             "login": login,
             "password": hash_password(password, salt),
-            "admin": admin,
+            "admin": 0,
             "salt": salt.hex(),
             "token": token
         }).execute()
@@ -54,13 +55,32 @@ def get_users():
 # Récupérer un utilisateur par son ID
 def get_user(user_id):
     """
+    Récupère les éléments nécessaires d'un utilisateur spécifique par son ID.
+
+    :param user_id: ID de l'utilisateur
+    :return: Données de l'utilisateur ou None en cas d'erreur
+    """
+    try:
+        response = supabase.table("user") \
+            .select("id", "name", "surname", "admin", "login") \
+            .eq("id", user_id).execute()
+        return response.data[0]
+    except Exception as e:
+        print(f"Error retrieving user: {e}")
+        return None
+
+# Récupérer un utilisateur par son ID
+def get_full_user(user_id):
+    """
     Récupère les détails d'un utilisateur spécifique par son ID.
 
     :param user_id: ID de l'utilisateur
     :return: Données de l'utilisateur ou None en cas d'erreur
     """
     try:
-        response = supabase.table("user").select("id", "name", "surname", "admin", "token").eq("id", user_id).execute()
+        response = supabase.table("user") \
+            .select("id", "name", "surname", "admin", "login", "login", "token") \
+            .eq("id", user_id).execute()
         return response.data[0]
     except Exception as e:
         print(f"Error retrieving user: {e}")
@@ -116,7 +136,7 @@ def login_user(login, password):
         if response.data:
             user = response.data[0]
             if user["password"] == hash_password(password, bytes.fromhex(user["salt"])):
-                return get_user(user["id"])
+                return get_full_user(user["id"])
             print(f"Mot de passe incorrect pour {user['login']}")
         return None
     except Exception as e:

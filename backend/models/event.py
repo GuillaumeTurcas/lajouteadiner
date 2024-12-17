@@ -139,7 +139,7 @@ def get_upcoming_events():
 # Lire tous les événements à venir pour un utilisateur
 def get_upcoming_events_user(user_id):
     """
-    Récupère tous les événements à venir pour un utilisateur spécifique.
+    Récupère tous les événements à venir liés à un utilisateur spécifique.
 
     :param user_id: ID de l'utilisateur
     :return: Liste des événements ou None en cas d'erreur

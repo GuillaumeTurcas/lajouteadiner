@@ -1,6 +1,7 @@
 from flask import jsonify, request
 from flask_restx import Namespace, Resource, fields
 from models.item import *
+from auth import *
 import json
 
 item_ns = Namespace('items', description='Item related operations')
@@ -20,6 +21,8 @@ item_event_model = item_ns.model('ItemEvent', {
 @item_ns.route('/')
 class ItemList(Resource):
     @item_ns.doc('list_items')
+    @login_required
+    @admin_required
     def get(self):
         """List all items"""
         items = get_items()
@@ -27,7 +30,8 @@ class ItemList(Resource):
 
     @item_ns.expect(item_model)
     @item_ns.doc('add_item')
-    def post(self):
+    @login_required
+    def post(self): 
         """Create a new item"""
         data = request.json
         item = create_item(data['name'], data['quantity'], data['description'], data['event'])
@@ -38,6 +42,8 @@ class ItemList(Resource):
 class Item(Resource):
     @item_ns.expect(item_model)
     @item_ns.doc('modify_item')
+    @login_required
+    @admin_or_organizer_required
     def put(self, item_id):
         """Update an item by ID"""
         data = request.json
@@ -45,15 +51,20 @@ class Item(Resource):
         return jsonify(item)
 
     @item_ns.doc('remove_item')
+    @login_required
+    @admin_or_organizer_required
     def delete(self, item_id):
         """Delete an item by ID"""
-        delete_item(item_id)
+        delete_item(item_id) 
         return jsonify({'message': 'Item deleted'})
+
 @item_ns.route('/event/<int:event_id>')
 @item_ns.param('event_id', 'The event identifier')
 class ItemsByEvent(Resource):
     @item_ns.doc('items_user')
+    @login_required
+    @admin_or_guests_required
     def get(self, event_id):
         """List items by event ID"""
         items = get_items_event(event_id)
-        return jsonify(json.dumps(items))
+        return jsonify(items)

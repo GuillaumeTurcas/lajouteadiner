@@ -102,18 +102,14 @@ def items_for_a_guest(guest_id):
     :return: Liste des items ou None en cas d'erreur
     """
     try:
-        guest = supabase.table("guest").select("*").eq("id", guest_id).execute().data[0]
-        item_ids = [item["id"] for item in supabase.table("item").select("*").eq("event", guest["event"]).execute().data]
-
-        return (
-            None if not item_ids else
-            supabase.table("assign")
-            .select("*")
-            .in_("item", item_ids)
-            .eq("guest", guest_id)
-            .execute()
-            .data
-        )
+        assigns = supabase.table("assign").select("*") \
+            .eq("guest", guest_id) \
+            .execute().data
+        response = [supabase.table("item").select("*") \
+            .eq("id", assign["item"]) \
+            .execute().data[0] \
+            for assign in assigns]
+        return response
     except Exception as e:
         print(f"Error retrieving items for guest: {e}")
         return None
