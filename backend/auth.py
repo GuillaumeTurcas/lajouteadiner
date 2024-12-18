@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import session, jsonify
+from models.user import *
 from models.guest import *
 from models.event import *
 from models.item import *
@@ -10,11 +11,15 @@ from models.item import *
 # ----------------------------
 def login_required(f):
     """
-    Décorateur pour s'assurer que l'utilisateur est connecté.
+    Décorateur pour s"assurer que l"utilisateur est connecté.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user' not in session:
+        if (
+            "user" not in session 
+            or not session.get("logged_in") 
+            or get_full_user(session["user"]).get("token") != session.get("token")
+        ):
             return jsonify({"error": "Authentification requise"})
         return f(*args, **kwargs)
     return decorated_function
@@ -25,7 +30,7 @@ def login_required(f):
 # ----------------------------
 def owner_required(f):
     """
-    Décorateur pour vérifier si l'utilisateur est le propriétaire.
+    Décorateur pour vérifier si l"utilisateur est le propriétaire.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -43,7 +48,7 @@ def owner_required(f):
 # ----------------------------
 def admin_required(f):
     """
-    Décorateur pour vérifier si l'utilisateur est administrateur.
+    Décorateur pour vérifier si l"utilisateur est administrateur.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -58,7 +63,7 @@ def admin_required(f):
 # ----------------------------
 def admin_or_owner_required(f):
     """
-    Décorateur pour vérifier si l'utilisateur est admin ou propriétaire.
+    Décorateur pour vérifier si l"utilisateur est admin ou propriétaire.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -76,7 +81,7 @@ def admin_or_owner_required(f):
 # ----------------------------
 def admin_or_organizer_required(f):
     """
-    Décorateur pour vérifier si l'utilisateur est admin ou organisateur de l'événement.
+    Décorateur pour vérifier si l"utilisateur est admin ou organisateur de l"événement.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -96,7 +101,7 @@ def admin_or_organizer_required(f):
 # ----------------------------
 def admin_or_guests_required(f):
     """
-    Décorateur pour vérifier si l'utilisateur est admin ou invité.
+    Décorateur pour vérifier si l"utilisateur est admin ou invité.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -119,13 +124,13 @@ def admin_or_guests_required(f):
 # ----------------------------
 def admin_or_guest_required(f):
     """
-    Décorateur pour vérifier si l'utilisateur est admin ou un invité spécifique.
+    Décorateur pour vérifier si l"utilisateur est admin ou un invité spécifique.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         guest = retrieve_guest(kwargs)
 
-        # Vérifications d'authentification
+        # Vérifications d"authentification
         if "user" not in session or "admin" not in session:
             return jsonify(error="Authentification requise")
         # Vérification des droits
@@ -140,7 +145,7 @@ def admin_or_guest_required(f):
 
 
 # ----------------------------
-# Fonction d'autorisation : Admin ou invité
+# Fonction d"autorisation : Admin ou invité
 # ----------------------------
 def authorize(data):
     """
@@ -152,7 +157,7 @@ def authorize(data):
 
     if not event:
         return {"error": "Impossible de retrouver l'événement"}
-    # Récupérer tous les invités de l'événement
+    # Récupérer tous les invités de l"événement
     all_guests = get_guests_event(event["id"])
     is_guest = any(session["user"] == guest["user"] for guest in all_guests)
 
@@ -161,6 +166,24 @@ def authorize(data):
 # ----------------------------
 # Fonctions utilitaires
 # ----------------------------
+def retrieve_event(kwargs):
+    """
+    Récupère un invité à partir des paramètres fournis.
+    """
+    try:
+        if "event_id" in kwargs:
+            return get_event(kwargs["event_id"])
+        if "guest_id" in kwargs:
+            guest = get_guest(kwargs["guest_id"])
+            return get_event(guest["event_id"])
+        if "item_id" in kwargs:
+            item = get_item(kwargs["item_id"])
+            return get_event(item["event_id"])
+        raise ValueError("Impossible de retrouver l'invité")
+    except:
+        return None
+
+
 def retrieve_guest(kwargs):
     """
     Récupère un invité à partir des paramètres fournis.

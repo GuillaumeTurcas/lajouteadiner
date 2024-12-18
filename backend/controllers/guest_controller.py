@@ -4,17 +4,17 @@ from models.guest import *
 from auth import *
 
 # Guest namespace
-guest_ns = Namespace('guests', description='Guest related operations')
+guest_ns = Namespace("guests", description="Guest related operations")
 
 # Guest model for Swagger documentation
-guest_model = guest_ns.model('Guest', {
-    'user': fields.Integer(required=True, description='User ID of the guest'),
-    'event': fields.Integer(required=True, description='Event ID the guest is assigned to')
+guest_model = guest_ns.model("Guest", {
+    "user": fields.Integer(required=True, description="User ID of the guest"),
+    "event": fields.Integer(required=True, description="Event ID the guest is assigned to")
 })
 
-@guest_ns.route('/')
+@guest_ns.route("/")
 class GuestList(Resource):
-    @guest_ns.doc('list_guests')
+    @guest_ns.doc("list_guests")
     @login_required
     @admin_required
     def get(self):
@@ -23,18 +23,18 @@ class GuestList(Resource):
         return jsonify(guests)
 
     @guest_ns.expect(guest_model)
-    @guest_ns.doc('add_guest')
+    @guest_ns.doc("add_guest")
     @login_required
     def post(self):
         """Create a new guest"""
         data = request.json
-        guest = create_guest(data['user'], data['event']) if authorize(data) else None
+        guest = create_guest(data["user"], data["event"]) if authorize(data) else None
         return jsonify(guest)
 
-@guest_ns.route('/<int:guest_id>') 
-@guest_ns.param('guest_id', 'The guest identifier') 
+@guest_ns.route("/<int:guest_id>") 
+@guest_ns.param("guest_id", "The guest identifier") 
 class Guest(Resource):
-    @guest_ns.doc('get_guest')
+    @guest_ns.doc("get_guest")
     @login_required
     @admin_or_guests_required
     def get(self, guest_id):
@@ -42,7 +42,7 @@ class Guest(Resource):
         guest = get_guest(guest_id)
         return jsonify(guest)
 
-    @guest_ns.doc('accept_guest')
+    @guest_ns.doc("accept_guest")
     @login_required
     @admin_or_guest_required
     def post(self, guest_id):
@@ -50,17 +50,17 @@ class Guest(Resource):
         guest = accept_guest(guest_id)
         return jsonify(guest)
 
-    @guest_ns.doc('remove_guest') 
+    @guest_ns.doc("remove_guest") 
     @login_required
     @admin_or_guest_required
     def delete(self, guest_id):
         """Delete a guest by ID"""
         delete_guest(guest_id)
-        return jsonify({'message': 'Guest deleted'})
+        return jsonify({"message": "Guest deleted"})
 
-@guest_ns.route('/items_for_a_guest/<int:guest_id>') 
+@guest_ns.route("/items_for_a_guest/<int:guest_id>") 
 class Assign(Resource):
-    @guest_ns.doc('items_for_a_guest')
+    @guest_ns.doc("items_for_a_guest")
     @login_required
     @admin_or_guests_required
     def get(self, guest_id):

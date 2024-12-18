@@ -12,12 +12,11 @@ def create_assign(guest, item, quantity):
     :param guest: ID de l'invité
     :param item: ID de l'item
     :param quantity: Quantité assignée
-    :return: Données de l'assignation créée ou None en cas d'erreur
+    :return: Données de l'assignation créée ou message d'erreur en cas d'erreur
     """
     try:
         if verif_quantity(item, int(quantity)):
-            print("Too much quantity")
-            return None
+            return {"error": "Too much quanity"}
         guest_data = supabase.table("guest").select("*").eq("id", guest).execute().data[0]
         item_data = supabase.table("item").select("*").eq("id", item).execute().data[0]
         if guest_data["event"] == item_data["event"]:
@@ -28,24 +27,22 @@ def create_assign(guest, item, quantity):
             }).execute()
             return response.data
         else:
-            return None
+            return {"error": "Impossible quantity"}
     except Exception as e:
-        print(f"Error creating assign: {e}")
-        return None
+        return {"error": f"Error creating assign: {e}"}
 
 # Lire toutes les assignations
 def get_assigns():
     """
     Récupère toutes les assignations.
 
-    :return: Liste des assignations ou None en cas d'erreur
+    :return: Liste des assignations ou message d'erreur en cas d'erreur
     """
     try:
         response = supabase.table("assign").select("*").execute()
         return response.data
     except Exception as e:
-        print(f"Error retrieving assigns: {e}")
-        return None
+        return {"error": f"Error retrieving assigns: {e}"}
 
 # Lire une assignation par son ID
 def get_assign(assign_id):
@@ -53,14 +50,13 @@ def get_assign(assign_id):
     Récupère une assignation spécifique par son ID.
 
     :param assign_id: ID de l'assignation
-    :return: Données de l'assignation ou None en cas d'erreur
+    :return: Données de l'assignation ou message d'erreur en cas d'erreur
     """
     try:
         response = supabase.table("assign").select("*").eq("id", assign_id).execute().data[0]
         return response
     except Exception as e:
-        print(f"Error retrieving assign: {e}")
-        return None
+        return {"error": f"Error retrieving assign: {e}"}
 
 # Mettre à jour une assignation
 def update_assign(assign_id, update_data):
@@ -69,7 +65,7 @@ def update_assign(assign_id, update_data):
 
     :param assign_id: ID de l'assignation
     :param update_data: Dictionnaire des champs à mettre à jour
-    :return: Données mises à jour ou None en cas d'erreur
+    :return: Données mises à jour ou message d'erreur en cas d'erreur
     """
     try:
         # Récupérer les données existantes de l'assignation
@@ -85,23 +81,20 @@ def update_assign(assign_id, update_data):
                 if update_data["guest"] == guest["id"]:
                     guest_in_event = True
             if guest_in_event == False:
-                print("Guest is not part of the event")
-                return None
+                return {"error": "Guest is not part of the event"}
 
         # Vérifier la quantité si elle est cohérente
         if "quantity" in update_data:
             current_quantity = assign["quantity"]
             new_quantity = update_data["quantity"]
             if verif_quantity(item_id, new_quantity - current_quantity):
-                print("Too much quantity")
-                return None
+                return {"error": "Too much quanity"}
 
         # Effectuer la mise à jour
         response = supabase.table("assign").update(update_data).eq("id", assign_id).execute()
         return response.data
     except Exception as e:
-        print(f"Error updating assign: {e}")
-        return None
+        return {"error": f"Error updating assign: {e}"}
 
 # Supprimer une assignation
 def delete_assign(assign_id):
@@ -115,8 +108,7 @@ def delete_assign(assign_id):
         response = supabase.table("assign").delete().eq("id", assign_id).execute()
         return response.data
     except Exception as e:
-        print(f"Error deleting assign: {e}")
-        return None
+        return {"error": f"Error deleting assign: {e}"}
 
 # Vérifier la quantité d'un item pour une assignation
 def verif_quantity(item_id, quantity_assign):
@@ -134,5 +126,4 @@ def verif_quantity(item_id, quantity_assign):
             quantity_assign += assign["quantity"]
         return quantity_assign > quantity
     except Exception as e:
-        print(f"Error verifying quantity: {e}")
-        return None
+        return {"error": f"Error verifying quantity: {e}"}
