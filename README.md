@@ -1,85 +1,165 @@
-
 # La Joute à Dîner
 
-**La Joute à Dîner** est un projet conçu pour gérer les soirées. Ce système propose des fonctionnalités robustes pour gérer les invités et ce qu'ils doivent apporter.
+**La Joute à Dîner** est un projet conçu pour simplifier l'organisation des soirées entre amis. Ce système permet de gérer les invités, de suivre les contributions attendues et d'assurer une organisation fluide.
 
-## Fonctionnalités
+---
 
-- **Gestion des utilisateurs** 
-- **Connexion avec Supabase** pour la gestion des données.
-- **API REST** construite avec Flask.
-- **Documentation Swagger** accessible depuis /doc.
-- Gestion sécurisée des données avec un fichier de configuration personnalisé.
+## 📋 Table des Matières
+1. [Fonctionnalités](#fonctionnalites)
+2. [Prérequis](#prerequis)
+3. [Installation](#installation)
+4. [Configuration](#configuration)
+5. [Démarrage](#demarrage)
+6. [Structure du projet](#structure-du-projet)
+7. [Documentation de l'API](#documentation-de-lapi)
+8. [Technologies utilisées](#technologies-utilisees)
+9. [Contribuer](#contribuer)
+10. [Licence](#licence)
 
-## Prérequis
+---
 
-Avant de commencer, vous aurez besoin de :
+## ⚙️ Fonctionnalités
 
-- Python 3.8 ou supérieur installé sur votre machine.
-- Une instance Supabase avec ses clés d'accès.
+- **Gestion des utilisateurs** : Ajout, modification et suppression des invités.
+- **Connexion sécurisée avec Supabase** pour la gestion des données utilisateurs et des soirées.
+- **API RESTful** : Construite avec Flask pour une interaction flexible.
+- **Documentation Swagger** : L'API est documentée et accessible depuis `/doc`.
+- **Personnalisation** : Configuration sécurisée via un fichier `.env`.
 
-## Installation
+---
 
-Suivez ces étapes pour configurer le projet sur votre machine locale :
+## 🛠️ Prérequis
 
-1. Clonez le dépôt :
-   ```bash
-   git clone https://github.com/GuillaumeTurcas/lajouteadiner.git
-   cd lajouteadiner
-   ```
+Assurez-vous d'avoir les outils suivants installés sur votre machine :
 
-2. Installez l'environnement virtuel Python :
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Sur Windows, utilisez `venv\Scripts\activate`
-   ```
+- [Python 3.8+](https://www.python.org/)
+- [pip](https://pip.pypa.io/en/stable/) pour la gestion des paquets
+- [Supabase](https://supabase.io/) pour les bases de données
+- [Git](https://git-scm.com/) pour cloner le projet
 
-3. Installez les dépendances :
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-4. Configurez les clés et secrets nécessaires en créant le fichier suivant :
-   `backend/security_config/secret_data.py`
-   avec ce modèle :
-   ```python
-   SUPABASE_URL = "url"
-   SUPABASE_KEY = "key"
+## 🚀 Installation
 
-   secret_key = "Secret Key"
+Clonez le projet et installez les dépendances :
 
-   default_password = "default".encode("utf-8")
-   pepper = "pepper"
-   iterations = 1
-   ```
-
-## Utilisation
-
-Pour lancer le projet localement, utilisez la commande suivante :
 ```bash
-cd backend
-flask run
+# Clonez le dépôt
+git clone https://github.com/votreutilisateur/lajouteadiner.git
+cd lajouteadiner
+
+# Activez l'environnement virtuel
+python -m venv venv
+source venv/bin/activate  # Sur Windows : venv\Scripts\activate
+
+# Installez les dépendances
+pip install -r requirements.txt
 ```
 
-Accédez à l'interface ou aux API via `http://localhost:5000`.
+---
 
-## Dépendances
+## ⚙️ Configuration
 
-Les principales bibliothèques utilisées dans ce projet sont :
+Configurez les clés et secrets nécessaires en créant le fichier suivant :
+`backend/security_config/secret_data.py`
+avec ce modèle :
 
-- Flask : un micro-framework pour créer des API web.
-- Flask-CORS : pour gérer les requêtes cross-origin.
-- Supabase : pour la gestion des bases de données.
-- Requests : pour effectuer des requêtes HTTP.
+```python
+SUPABASE_URL = "url"
+SUPABASE_KEY = "key"
 
-Toutes les dépendances nécessaires sont listées dans le fichier `requirements.txt`.
+secret_key = "Secret Key"
 
-## Structure du projet
+default_password = "default".encode("utf-8")
+pepper = "pepper"
+iterations = 1
+```
 
-- `backend/` : Contient les fichiers principaux de l'API.
-- `lib/`, `include/` : Environnement Python.
-- `pyvenv.cfg` : Fichier de configuration de l'environnement.
+---
 
-## Contribution
+## ▶️ Démarrage
 
-Les contributions sont les bienvenues ! Veuillez ouvrir une issue ou soumettre une pull request avec vos modifications.
+Démarrez l'API Flask localement :
+
+```bash
+python backend/app.py
+```
+
+L'API sera disponible sur `http://127.0.0.1:5000`.
+
+Accédez à la documentation Swagger via :
+
+```
+http://127.0.0.1:5000/doc
+```
+
+---
+
+## 📂 Structure du Projet
+
+```plaintext
+lajouteadiner/
+├── backend/               # Code source de l'API Flask
+│   ├── app.py            # Point d'entrée principal
+│   ├── routes/           # Définition des routes API
+│   ├── models/           # Modèles de données
+│   ├── utils/            # Fonctions utilitaires
+│   ├── auth.py           # Gestion de l'authentification
+│
+├── .gitignore            # Fichiers à ignorer par Git
+├── requirements.txt      # Liste des dépendances Python
+├── README.md             # Documentation principale
+└── venv/                 # Environnement virtuel Python
+```
+
+---
+
+## 📜 Documentation de l'API
+
+La documentation complète de l'API est disponible sur Swagger, accessible localement après le démarrage du projet :
+
+```plaintext
+http://127.0.0.1:5000/doc
+```
+
+Exemples de routes :
+- `GET /api/users` : Récupère la liste des utilisateurs.
+- `POST /api/users` : Ajoute un nouvel utilisateur.
+- `DELETE /api/users/{id}` : Supprime un utilisateur.
+
+---
+
+## 🛠️ Technologies Utilisées
+
+- **Backend** : Flask
+- **Base de données** : Supabase
+- **Langage** : Python
+- **Documentation** : Swagger
+- **Environnement** : Virtualenv
+
+---
+
+## 🤝 Contribuer
+
+Les contributions sont les bienvenues ! Pour proposer des modifications :
+
+1. Forkez le projet.
+2. Créez une branche pour votre fonctionnalité :
+   ```bash
+   git checkout -b nouvelle-fonctionnalite
+   ```
+3. Committez vos changements :
+   ```bash
+   git commit -m "Ajout d'une nouvelle fonctionnalité"
+   ```
+4. Poussez vos modifications :
+   ```bash
+   git push origin nouvelle-fonctionnalite
+   ```
+5. Créez une Pull Request.
+
+---
+
+## 📄 Licence
+
+Ce projet est sous licence libre.
