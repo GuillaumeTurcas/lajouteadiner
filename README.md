@@ -5,16 +5,16 @@
 ---
 
 ## 📋 Table des Matières
-1. [Fonctionnalités](#fonctionnalites)
-2. [Prérequis](#prerequis)
-3. [Installation](#installation)
-4. [Configuration](#configuration)
-5. [Démarrage](#demarrage)
-6. [Structure du projet](#structure-du-projet)
-7. [Documentation de l'API](#documentation-de-lapi)
-8. [Technologies utilisées](#technologies-utilisees)
-9. [Contribuer](#contribuer)
-10. [Licence](#licence)
+1. [⚙️ Fonctionnalités](#️-fonctionnalités)
+2. [🛠️ Prérequis](#️-prérequis)
+3. [🚀 Installation](#-installation)
+4. [⚙️ Configuration](#️-configuration)
+5. [▶️ Démarrage](#️-démarrage)
+6. [📂 Structure du Projet](#-structure-du-projet)
+7. [📜 Documentation de l'API](#-documentation-de-lapi)
+8. [🛠️ Technologies Utilisées](#️-technologies-utilisées)
+9. [🤝 Contribuer](#-contribuer)
+10. [📄 Licence](#-licence)
 
 ---
 
@@ -162,4 +162,4 @@ Les contributions sont les bienvenues ! Pour proposer des modifications :
 
 ## 📄 Licence
 
-Ce projet est sous licence libre.
+Ce projet est sous licence libre !
