@@ -117,6 +117,20 @@ def get_guests_event(event_id):
     except Exception as e:
         return {"error": f"Error retrieving event users: {e}"}
 
+# Lire tous les invités d'un événement
+def get_detailed_guests_event(event_id):
+    """
+    Récupère tous les invités d'un événement spécifique.
+
+    :param event_id: ID de l'événement
+    :return: Liste des invités ou message d'erreur en cas d'erreur
+    """
+    try:
+        response = supabase.table("guest").select("*, user!inner(id, login, name, surname)").eq("event", event_id).execute()
+        return response.data
+    except Exception as e:
+        return {"error": f"Error retrieving event users: {e}"}
+
 # Lire tous les événements à venir
 def get_upcoming_events():
     """

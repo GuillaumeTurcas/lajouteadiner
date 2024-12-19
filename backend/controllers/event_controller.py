@@ -87,7 +87,7 @@ class Event(Resource):
     def get(self, event_id):
         """List all guest for an event"""
         try:
-            events = get_guests_event(event_id)
+            events = get_detailed_guests_event(event_id)
             return jsonify(events)
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
