@@ -22,6 +22,21 @@ def create_user(name, surname, login, password, admin):
     salt = os.urandom(32)
     token = os.urandom(32).hex()
     try:
+        is_login_exist = supabase.table("user")
+            .select(*)
+            .eq("login", login)
+            .execute() 
+        if is_login_exist:
+            return {
+                "create_user": False,
+                "reason": "login already exist"
+            }
+        if len(password) < 8 or len(login_user) < 4:
+            return {
+                "create_user": False,
+                "reason": "not enough character for login or password"
+            }
+
         response = supabase.table("user").insert({
             "name": name,
             "surname": surname,
@@ -31,9 +46,14 @@ def create_user(name, surname, login, password, admin):
             "salt": salt.hex(),
             "token": token
         }).execute()
-        return response.data
+        return {
+            "create_user": True
+        }
     except Exception as e:
-        return {"error": f"Error creating user: {e}"}
+        return {
+            "create_user": False,
+            "reason": f"Error creating user: {e}"
+            }
 
 
 def get_users():
