@@ -6,7 +6,7 @@
     let { form }: { form: ActionData } = $props();
 </script>
 
-<div class="container p-3 mx-auto col-3">
+<div class="container p-3 mx-auto col-4">
     <div class="mb-3">
         <p class="text-center">Log in to continue</p>
     </div>
@@ -27,7 +27,7 @@
         <div class="mb-3">
             <input type="text" class="form-control" id="login" name="login" 
             value={form?.login ?? ''}  placeholder="Username" autocomplete="username" required>
-          </div>
+        </div>
         <div class="mb-3">
           <input type="password" class="form-control" id="password" name="password"
           value={form?.incorrect ? '' : undefined} placeholder="Password" autocomplete="current-password" required>

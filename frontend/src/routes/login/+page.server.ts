@@ -1,5 +1,5 @@
 import { type Cookies, type Actions, redirect, fail } from '@sveltejs/kit';
-import { BACKEND_URL, COOKIE_PATH } from "$env/static/private";
+import { BACKEND_URL, COOKIES_AGE_DAY } from "$env/static/private";
 
 export const actions = {
 	login: async ({ cookies, request }: { cookies: Cookies; request: Request }) => {
@@ -20,16 +20,19 @@ export const actions = {
         });
 
         if (!response.ok) {
+			return fail(400, { incorrect: true, login, message: "Something has gone wrong!" });
+		}
+
+        const id = (await response.json())?.id;
+        const setCookieHeader = await response.headers.get('set-cookie');
+
+        if (!setCookieHeader || !id) {
 			return fail(400, { incorrect: true, login, message: "Invalid credentials!" });
 		}
 
-        const user = await response.json();
-
-        if (!user?.token) {
-			return fail(400, { incorrect: true, login, message: "Invalid credentials!" });
-		}
-
-        cookies.set('token', user.token, { path: `/${COOKIE_PATH}` });
+        const cookieAgeDay: number = Number(COOKIES_AGE_DAY);
+        cookies.set('session', setCookieHeader.split("session=")[1].split(";")[0], { path: '/', maxAge: 60 * 60 * 24 * cookieAgeDay });
+        cookies.set('user_id', id, { path: '/', maxAge: 60 * 60 * 24 * cookieAgeDay });
         return redirect(303, '/home');
 	},
 } satisfies Actions;
