@@ -25,8 +25,11 @@ class GuestList(Resource):
     @admin_required
     def get(self):
         """List all guests"""
-        guests = get_guests()
-        return jsonify(guests)
+        try:
+            guests = get_guests()
+            return jsonify(guests)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
     @guest_ns.expect(guest_model)
     @guest_ns.doc("add_guest")
@@ -56,8 +59,11 @@ class Guest(Resource):
     @admin_or_guests_required
     def get(self, guest_id):
         """Get a guest by ID"""
-        guest = get_guest(guest_id)
-        return jsonify(guest)
+        try:
+            guest = get_guest(guest_id)
+            return jsonify(guest)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
 
     @guest_ns.expect(guest_accept_model)
@@ -66,35 +72,41 @@ class Guest(Resource):
     @admin_or_guest_required
     def put(self, guest_id):
         """A guest change his decision to go to an event"""
-        data = request.json
-        guest_prov = get_guest(guest_id)
-        event_prov = get_event(guest_prov["event"])
-        if guest_prov["user"] == event_prov["organizer"]:
-            return jsonify({"error": "The organizer can't change his decision"})
-        if event_prov["deadline"]:
-            deadline = datetime.fromisoformat(event_prov["deadline"])
-            now_utc = datetime.now(pytz.utc)
-            if now_utc > deadline:
-                return jsonify({
-                    "too_late": True
-                    })
-        guest = accept_guest(guest_id, data)
-        return jsonify({
-            "guest": guest,
-            "too_late": False
-            })
+        try:
+            data = request.json
+            guest_prov = get_guest(guest_id)
+            event_prov = get_event(guest_prov["event"])
+            if guest_prov["user"] == event_prov["organizer"]:
+                return jsonify({"error": "The organizer can't change his decision"})
+            if event_prov["deadline"]:
+                deadline = datetime.fromisoformat(event_prov["deadline"])
+                now_utc = datetime.now(pytz.utc)
+                if now_utc > deadline:
+                    return jsonify({
+                        "too_late": True
+                        })
+            guest = accept_guest(guest_id, data)
+            return jsonify({
+                "guest": guest,
+                "too_late": False
+                })
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
     @guest_ns.doc("remove_guest") 
     @login_required
     @admin_or_guest_required
     def delete(self, guest_id):
         """Delete a guest by ID"""
-        guest_prov = get_guest(guest_id)
-        event_prov = get_event(guest_prov["event"])
-        if guest_prov["user"] == event_prov["organizer"]:
-            return jsonify({"error": "The organizer can't be deleted"})
-        delete_guest(guest_id)
-        return jsonify({"message": "Guest deleted"})
+        try:
+            guest_prov = get_guest(guest_id)
+            event_prov = get_event(guest_prov["event"])
+            if guest_prov["user"] == event_prov["organizer"]:
+                return jsonify({"error": "The organizer can't be deleted"})
+            delete_guest(guest_id)
+            return jsonify({"message": "Guest deleted"})
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
 @guest_ns.route("/items_for_a_guest/<int:guest_id>") 
 class Assign(Resource):
@@ -103,5 +115,8 @@ class Assign(Resource):
     @admin_or_guests_required
     def get(self, guest_id):
         """Get all items for a guest"""
-        items = items_for_a_guest(guest_id)
-        return jsonify(items)
+        try:
+            items = items_for_a_guest(guest_id)
+            return jsonify(items)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})

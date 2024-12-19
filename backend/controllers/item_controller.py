@@ -26,8 +26,11 @@ class ItemList(Resource):
     @admin_required
     def get(self):
         """List all items"""
-        items = get_items()
-        return jsonify(items)
+        try:
+            items = get_items()
+            return jsonify(items)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
     @item_ns.expect(item_model)
     @item_ns.doc("add_item")
@@ -58,17 +61,23 @@ class Item(Resource):
     @admin_or_organizer_required
     def put(self, item_id):
         """Update an item by ID"""
-        data = request.json
-        item = update_item(item_id, data)
-        return jsonify(item)
+        try:
+            data = request.json
+            item = update_item(item_id, data)
+            return jsonify(item)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
     @item_ns.doc("remove_item")
     @login_required
     @admin_or_organizer_required
     def delete(self, item_id):
         """Delete an item by ID"""
-        delete_item(item_id) 
-        return jsonify({"message": "Item deleted"})
+        try:
+            delete_item(item_id) 
+            return jsonify({"message": "Item deleted"})
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
 @item_ns.route("/event/<int:event_id>")
 @item_ns.param("event_id", "The event identifier")
@@ -78,5 +87,8 @@ class ItemsByEvent(Resource):
     @admin_or_guests_required
     def get(self, event_id):
         """List items by event ID"""
-        items = get_items_event(event_id)
-        return jsonify(items)
+        try:
+            items = get_items_event(event_id)
+            return jsonify(items)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})

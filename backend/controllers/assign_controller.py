@@ -21,8 +21,11 @@ class AssignList(Resource):
     @admin_required
     def get(self): 
         """List all assignments"""
-        assigns = get_assigns()
-        return jsonify(assigns)
+        try:
+            assigns = get_assigns()
+            return jsonify(assigns)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
     @assign_ns.expect(assign_model)
     @assign_ns.doc("add_assign")
@@ -42,8 +45,8 @@ class AssignList(Resource):
                 else:
                     return jsonify({"error": "You are not a guest or an admin to add an assign"})
             return jsonify(assign)
-        except:
-            return None
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
 @assign_ns.route("/<int:assign_id>")
 @assign_ns.param("assign_id", "The assignment identifier")
@@ -53,8 +56,11 @@ class Assign(Resource):
     @admin_or_guests_required
     def get(self, assign_id): 
         """Get an assignment by ID"""
-        assign = get_assign(assign_id)
-        return jsonify(assign)
+        try:
+            assign = get_assign(assign_id)
+            return jsonify(assign)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
     @assign_ns.expect(assign_model)
     @assign_ns.doc("modify_assign")
@@ -62,14 +68,20 @@ class Assign(Resource):
     @admin_or_guests_required
     def put(self, assign_id): 
         """Update an assignment by ID"""
-        data = request.json
-        assign = update_assign(assign_id, data)
-        return jsonify(assign)
+        try:
+            data = request.json
+            assign = update_assign(assign_id, data)
+            return jsonify(assign)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
     @assign_ns.doc("remove_assign")
     @login_required
     @admin_or_guest_required
     def delete(self, assign_id): 
         """Delete an assignment by ID"""
-        delete_assign(assign_id)
-        return jsonify({"message": "Assign deleted"})
+        try:
+            delete_assign(assign_id)
+            return jsonify({"message": "Assign deleted"})
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})

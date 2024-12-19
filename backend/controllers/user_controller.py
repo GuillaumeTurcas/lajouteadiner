@@ -47,24 +47,30 @@ class UserList(Resource):
     @admin_required
     def get(self):
         """List all users."""
-        users = get_users()
-        return jsonify(users)
+        try:
+            users = get_users()
+            return jsonify(users)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
     @user_ns.expect(user_model)
     @user_ns.doc("add_user")
     def post(self):
         """Create a new user."""
-        data = request.json
-        admin = 0
-        print(admin)
-        if "admin" in session:
-            if data["admin"] <= session["admin"]:
-                admin = data["admin"]
-        user = create_user(
-            data["name"], data["surname"],
-            data["login"], data["password"], admin
-        )
-        return jsonify(user)
+        try:
+            data = request.json
+            admin = 0
+            print(admin)
+            if "admin" in session:
+                if data["admin"] <= session["admin"]:
+                    admin = data["admin"]
+            user = create_user(
+                data["name"], data["surname"],
+                data["login"], data["password"], admin
+            )
+            return jsonify(user)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
 
 @user_ns.route("/<int:user_id>")
@@ -74,8 +80,11 @@ class User(Resource):
     @login_required
     def get(self, user_id):
         """Get a user by ID."""
-        user = get_user(user_id)
-        return jsonify(user)
+        try:
+            user = get_user(user_id)
+            return jsonify(user)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
     @user_ns.expect(edit_user_model)
     @user_ns.doc("modify_user")
@@ -83,25 +92,31 @@ class User(Resource):
     @admin_or_owner_required
     def put(self, user_id):
         """Update a user by ID."""
-        data = request.json
-        if "admin" in data:
-            if data["admin"] > session["admin"]:
-                return {"error": "No authorization to make an admin"}
-        control_list = ["salt", "token", "password", "id"]
-        for control in control_list:
-            if control in data:
-                if session["admin"] != 2:
-                    return {"error": f"No authorization to change {control}"}
-        user = update_user(user_id, data)
-        return jsonify(user)
+        try:
+            data = request.json
+            if "admin" in data:
+                if data["admin"] > session["admin"]:
+                    return {"error": "No authorization to make an admin"}
+            control_list = ["salt", "token", "password", "id"]
+            for control in control_list:
+                if control in data:
+                    if session["admin"] != 2:
+                        return {"error": f"No authorization to change {control}"}
+            user = update_user(user_id, data)
+            return jsonify(user)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
     @user_ns.doc("remove_user")
     @login_required
     @admin_or_owner_required
     def delete(self, user_id):
         """Delete a user by ID."""
-        delete_user(user_id)
-        return jsonify({"message": "User deleted"})
+        try:
+            delete_user(user_id)
+            return jsonify({"message": "User deleted"})
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
 
 @user_ns.route("/full/<int:user_id>")
@@ -112,8 +127,11 @@ class FullUser(Resource):
     @user_ns.doc("get_full_user")
     def get(self, user_id):
         """Get full details of a user."""
-        user = get_full_user(user_id)
-        return jsonify(user)
+        try:
+            user = get_full_user(user_id)
+            return jsonify(user)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
 
 # ----------------------------
@@ -125,16 +143,19 @@ class Login(Resource):
     @user_ns.doc("login_user")
     def post(self):
         """Login a user."""
-        data = request.json
-        user = login_user(data["login"], data["password"])
-        if user is not None:
-            print(f"{user["surname"]} {user["name"]} est connecté")
-            session["logged_in"] = True
-            session["user"] = user["id"]
-            session["login"] = user["login"]
-            session["admin"] = user["admin"]
-            session["token"] = user["token"]
-        return jsonify(user)
+        try:
+            data = request.json
+            user = login_user(data["login"], data["password"])
+            if user is not None:
+                print(f"{user["surname"]} {user["name"]} est connecté")
+                session["logged_in"] = True
+                session["user"] = user["id"]
+                session["login"] = user["login"]
+                session["admin"] = user["admin"]
+                session["token"] = user["token"]
+            return jsonify(user)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
 
 @user_ns.route("/change_password/<int:user_id>")
@@ -146,10 +167,13 @@ class ChangePassword(Resource):
     @admin_or_owner_required
     def put(self, user_id):
         """Change a user"s password."""
-        data = request.json
-        response = change_password(user_id, data["old_password"], data["new_password"])
-        return jsonify({"change_password": response})
-
+        try:
+            data = request.json
+            response = change_password(user_id, data["old_password"], data["new_password"])
+            return jsonify({"change_password": response})
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
+            
 
 @user_ns.route("/reset_password/<int:user_id>")
 @user_ns.param("user_id", "The user identifier")
@@ -159,18 +183,24 @@ class ResetPassword(Resource):
     @admin_or_owner_required
     def post(self, user_id):
         """Reset a user"s password."""
-        response = reset_password(user_id)
-        return jsonify({"change_password": response})
+        try:
+            response = reset_password(user_id)
+            return jsonify({"change_password": response})
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
 
 @user_ns.route("/logout")
 class Logout(Resource):
     @user_ns.doc("logout_user")
     def post(self):
         """Logout a user."""
-        if session["logged_in"]:
-            session.pop("user", None)
-            session.pop("admin", None)
-            session.pop("login", None)
-            session.pop("token", None)
-        session["logged_in"] = False
-        return jsonify({"logout": True})
+        try:
+            if session["logged_in"]:
+                session.pop("user", None)
+                session.pop("admin", None)
+                session.pop("login", None)
+                session.pop("token", None)
+            session["logged_in"] = False
+            return jsonify({"logout": True})
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
