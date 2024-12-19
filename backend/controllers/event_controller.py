@@ -10,6 +10,7 @@ event_ns = Namespace("events", description="Event related operations")
 event_model = event_ns.model("Event", {
     "event": fields.String(required=True, description="Name of the event"),
     "date": fields.DateTime(required=True, dt_format="iso8601", description="Date of the event (YYYY-MM-DD)"),
+    "deadline": fields.DateTime(required=True, dt_format="iso8601", description="Deadline to accept (YYYY-MM-DD)"),
     "place": fields.String(required=True, description="Place of the event"),
     "organizer": fields.Integer(required=True, description="Organizer of the event")
 })
@@ -33,7 +34,7 @@ class EventList(Resource):
         if "organizer" in data:
             if session["user"] != data["organizer"] and session["admin"] < 1:
                 return {"error": "You don't have the permission"}
-        event = create_event(data["event"], data["date"], data["place"], data["organizer"])
+        event = create_event(data["event"], data["date"], data["deadline"], data["place"], data["organizer"])
         return jsonify(event)
 
 @event_ns.route("/<int:event_id>")

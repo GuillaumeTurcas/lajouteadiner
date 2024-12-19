@@ -59,7 +59,7 @@ def get_guest(guest_id):
         return {"error": f"Error retrieving guest: {e}"}
 
 
-def accept_guest(guest_id):
+def accept_guest(guest_id, data):
     """
     Change le statut d'acceptation d'un invité.
 
@@ -67,17 +67,11 @@ def accept_guest(guest_id):
     :return: Données mises à jour de l'invité ou message d'erreur en cas d'erreur
     """
     try:
-        change_accept = (
-            supabase.table("guest")
-            .select("*")
-            .eq("id", guest_id)
-            .execute()
-            .data[0]
-        )
-        change_accept["accept"] = not change_accept["accept"]
         response = (
             supabase.table("guest")
-            .update(change_accept)
+            .update({
+                "accept": data["accept"]
+                })
             .eq("id", guest_id)
             .execute()
         )

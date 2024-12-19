@@ -1,16 +1,17 @@
 from config import get_supabase_client
-from datetime import datetime
+import datetime 
 
 # Initialisation du client Supabase
 supabase = get_supabase_client()
 
 # Créer un événement
-def create_event(event, date, place, organizer):
+def create_event(event, date, deadline, place, organizer):
     """
     Crée un nouvel événement dans la table "event" et ajoute l'organisateur comme guest.
 
     :param event: Nom de l'événement
     :param date: Date de l'événement
+    :param deadline: Date limite pour accepter l'évènement
     :param place: Lieu de l'événement
     :param organizer: ID de l'organisateur
     :return: Données de l'événement créé ou message d'erreur en cas d'erreur
@@ -19,6 +20,7 @@ def create_event(event, date, place, organizer):
         response = supabase.table("event").insert({
             "event": event,
             "date": date,
+            "deadline": deadline,
             "place": place,
             "organizer": organizer
         }).execute()
@@ -123,7 +125,7 @@ def get_upcoming_events():
     :return: Liste des événements à venir ou message d'erreur en cas d'erreur
     """
     try:
-        today = datetime.utcnow().isoformat()
+        today = datetime.date.today()
         response = supabase.table("event").select("*").gt("date", today).execute()
         return response.data
     except Exception as e:
@@ -138,7 +140,7 @@ def get_upcoming_events_user(user_id):
     :return: Liste des événements ou message d'erreur en cas d'erreur
     """
     try:
-        today = datetime.utcnow().isoformat()
+        today = datetime.date.today()
         response = supabase.table("event").select("*, guest!inner(user)").eq("guest.user", user_id).gt("date", today).execute()
         return response.data
     except Exception as e:
