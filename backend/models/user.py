@@ -22,9 +22,9 @@ def create_user(name, surname, login, password, admin):
     salt = os.urandom(32)
     token = os.urandom(32).hex()
     try:
-        is_login_exist = supabase.table("user")
-            .select(*)
-            .eq("login", login)
+        is_login_exist = supabase.table("user") \
+            .select("*") \
+            .eq("login", login) \
             .execute() 
         if is_login_exist:
             return {

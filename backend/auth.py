@@ -5,6 +5,8 @@ from models.guest import *
 from models.event import *
 from models.item import *
 from models.assign import *
+from datetime import datetime, timedelta
+import pytz
 
 
 # ----------------------------
@@ -21,8 +23,13 @@ def login_required(f):
             or not session.get("logged_in") 
             or get_full_user(session["user"]).get("token") != session.get("token")
             or get_full_user(session["user"]).get("admin") != session.get("admin")
+            or get_full_user(session["user"]).get("login") != session.get("login")
+            or datetime.now(pytz.utc) > session.get("session_deadline")
         ):
-            return jsonify({"error": "Authentication required"})
+            return jsonify({
+                "is_login": False,
+                "error": "Authentication required"
+                })
         return f(*args, **kwargs)
     return decorated_function
 

@@ -5,6 +5,9 @@ from models.user import (
     update_user, delete_user, change_password, reset_password
 )
 from auth import *
+from datetime import datetime, timedelta
+import pytz
+from config import limit_session
 
 # Initialisation du namespace RESTX
 user_ns = Namespace("users", description="User related operations")
@@ -60,7 +63,6 @@ class UserList(Resource):
         try:
             data = request.json
             admin = 0
-            print(admin)
             if "admin" in session:
                 if data["admin"] <= session["admin"]:
                     admin = data["admin"]
@@ -153,6 +155,7 @@ class Login(Resource):
                 session["login"] = user["login"]
                 session["admin"] = user["admin"]
                 session["token"] = user["token"]
+                session["session_deadline"] = datetime.now(pytz.utc) + timedelta(hours=limit_session)
             return jsonify(user)
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
@@ -203,3 +206,18 @@ class Logout(Resource):
             return jsonify({"logout": True})
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
+
+@user_ns.route("/is_login")
+class Is_login(Resource):    
+    @user_ns.doc("is_login")
+    @login_required
+    def get(self):
+        """Return True if user is login."""
+        try:
+            return jsonify({
+                "is_login": True
+                })
+        except Exception as e:
+            return jsonify({
+                "is_login": False
+                })
