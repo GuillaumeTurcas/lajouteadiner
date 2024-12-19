@@ -47,7 +47,6 @@ password_model = user_ns.model("ChangePassword", {
 class UserList(Resource):
     @user_ns.doc("list_users")
     @login_required
-    @admin_required
     def get(self):
         """List all users."""
         try:
