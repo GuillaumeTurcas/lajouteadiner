@@ -143,6 +143,7 @@ class Login(Resource):
     @user_ns.doc("login_user")
     def post(self):
         """Login a user."""
+<<<<<<< HEAD
         try:
             data = request.json
             user = login_user(data["login"], data["password"])
@@ -156,6 +157,18 @@ class Login(Resource):
             return jsonify(user)
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
+=======
+        data = request.json
+        user = login_user(data["login"], data["password"])
+        if user is not None:
+            print(f'{user["surname"]} {user["name"]} est connecté')
+            session["logged_in"] = True
+            session["user"] = user["id"]
+            session["login"] = user["login"]
+            session["admin"] = user["admin"]
+            session["token"] = user["token"]
+        return jsonify(user)
+>>>>>>> 941b7ef049b3a62a659e11bcaa7e790066d8445b
 
 
 @user_ns.route("/change_password/<int:user_id>")
