@@ -18,10 +18,12 @@ def login_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        dt = session["session_deadline"]
+        sdl = f"{dt.year}-{dt.month:02d}-{dt.day:02d} {dt.hour:02d}:{dt.minute:02d}:{dt.second:02d}"
         if (
             "user" not in session 
             or not session.get("logged_in") 
-            or get_full_user(session["user"]).get("token") != session.get("token")
+            or get_signature(session["user"], session["token_prov"] + sdl) != session.get("signature")
             or get_full_user(session["user"]).get("admin") != session.get("admin")
             or get_full_user(session["user"]).get("login") != session.get("login")
             or datetime.now(pytz.utc) > session.get("session_deadline")

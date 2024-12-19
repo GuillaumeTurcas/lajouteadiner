@@ -149,13 +149,17 @@ class Login(Resource):
             data = request.json
             user = login_user(data["login"], data["password"])
             if user is not None:
-                print(f"{user["surname"]} {user["name"]} est connecté")
                 session["logged_in"] = True
                 session["user"] = user["id"]
                 session["login"] = user["login"]
                 session["admin"] = user["admin"]
-                session["token"] = user["token"]
                 session["session_deadline"] = datetime.now(pytz.utc) + timedelta(hours=limit_session)
+                session["token_prov"] = os.urandom(32).hex()  
+
+                dt = session["session_deadline"]
+                sdl = f"{dt.year}-{dt.month:02d}-{dt.day:02d} {dt.hour:02d}:{dt.minute:02d}:{dt.second:02d}"
+
+                session["signature"] = get_signature(session["user"], session["token_prov"] + sdl)
             return jsonify(user)
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
@@ -201,7 +205,9 @@ class Logout(Resource):
                 session.pop("user", None)
                 session.pop("admin", None)
                 session.pop("login", None)
-                session.pop("token", None)
+                session.pop("token_prov", None)
+                session.pop("signature", None)
+                session.pop("session_deadline", None)
             session["logged_in"] = False
             return jsonify({"logout": True})
         except Exception as e:

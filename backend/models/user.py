@@ -98,7 +98,7 @@ def get_full_user(user_id):
     try:
         response = (
             supabase.table("user")
-            .select("id", "name", "surname", "admin", "login", "token")
+            .select("id", "name", "surname", "admin", "token", "login")
             .eq("id", user_id)
             .execute()
         )
@@ -208,4 +208,22 @@ def reset_password(user_id):
         ).execute()
         return True
     except Exception as e:
-        return False
+        return {"error": f"Error reset password: {e}"}
+
+
+def get_signature(user_id, token_prov):
+    """
+    Signer la session de l'utilisateur.
+
+    :param user_id: ID de l'utilisateur
+    :param token_prov: Token éphémère de l'utilisateur
+    :return: La signature de la session de l'utilisateur.
+    """
+    try:
+        token = supabase.table("user").select("token").eq("id", user_id).execute().data[0]["token"]
+        signature = hash_password(
+            token_prov, token.encode("utf-8")
+            )
+        return signature
+    except Exception as e:
+        return {"error": f"Error: {e}"}
