@@ -73,12 +73,10 @@ class Guest(Resource):
             return jsonify({"error": "The organizer can't change his decision"})
         deadline = datetime.fromisoformat(event_prov["deadline"])
         now_utc = datetime.now(pytz.utc)
-
         if now_utc > deadline:
             return jsonify({
                 "too_late": True
                 })
-
         guest = accept_guest(guest_id, data)
         return jsonify({
             "guest": guest,
