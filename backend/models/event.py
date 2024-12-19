@@ -120,7 +120,7 @@ def get_guests_event(event_id):
 # Lire tous les invités d'un événement
 def get_detailed_guests_event(event_id):
     """
-    Récupère tous les invités d'un événement spécifique.
+    Récupère tous les invités de manière détaillée d'un événement spécifique.
 
     :param event_id: ID de l'événement
     :return: Liste des invités ou message d'erreur en cas d'erreur
