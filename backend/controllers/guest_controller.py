@@ -27,9 +27,20 @@ class GuestList(Resource):
     @login_required
     def post(self):
         """Create a new guest"""
-        data = request.json
-        guest = create_guest(data["user"], data["event"]) if authorize(data) else None
-        return jsonify(guest)
+        try:
+            data = request.json
+            if "event" in data:
+                if get_event(data["event"]) \
+                    .get("organizer") == session["user"] \
+                    or session["admin"] >= 1:
+                    guest = create_guest(data["user"], data["event"]) \
+                        if authorize(data) \
+                        else None
+                else:
+                    return jsonify({"error": "You are not the organizer or an admin to add a guest"})
+            return jsonify(guest)
+        except:
+            return jsonify({"error": "Impossible to create a new guest"})
 
 @guest_ns.route("/<int:guest_id>") 
 @guest_ns.param("guest_id", "The guest identifier") 

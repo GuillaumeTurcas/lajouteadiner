@@ -30,6 +30,9 @@ class EventList(Resource):
     def post(self):
         """Create a new event"""
         data = request.json
+        if "organizer" in data:
+            if session["user"] != data["organizer"] and session["admin"] < 1:
+                return {"error": "You don't have the permission"}
         event = create_event(data["event"], data["date"], data["place"], data["organizer"])
         return jsonify(event)
 

@@ -53,7 +53,7 @@ def get_item(item_id):
     """
     try:
         response = supabase.table("item").select("*").eq("id", item_id).execute()
-        return response.data
+        return response.data[0]
     except Exception as e:
         print(f"Error retrieving item: {e}")
         return {"error": f"Error retrieving item: {e}"}

@@ -1,6 +1,7 @@
 from flask import jsonify, request
 from flask_restx import Namespace, Resource, fields
 from models.item import *
+from models.event import *
 from auth import *
 import json
 
@@ -33,9 +34,20 @@ class ItemList(Resource):
     @login_required
     def post(self): 
         """Create a new item"""
-        data = request.json
-        item = create_item(data["name"], data["quantity"], data["description"], data["event"])
-        return jsonify(item)
+        try:
+            data = request.json
+            if "event" in data:
+                if get_event(data["event"]) \
+                    .get("organizer") == session["user"] \
+                    or session["admin"] >= 1:
+                    item = create_item(data["name"], \
+                        data["quantity"], data["description"], \
+                        data["event"])
+                else:
+                    return jsonify({"error": "You are not the organizer or an admin to add an item"})
+            return jsonify(item)
+        except:
+            return jsonify({"error": "Impossible to create a new item"})
 
 @item_ns.route("/<int:item_id>")
 @item_ns.param("item_id", "The item identifier")

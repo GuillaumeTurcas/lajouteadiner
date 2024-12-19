@@ -16,7 +16,7 @@ def create_assign(guest, item, quantity):
     """
     try:
         if verif_quantity(item, int(quantity)):
-            return {"error": "Too much quanity"}
+            return {"error": "Too much quantity"}
         guest_data = supabase.table("guest").select("*").eq("id", guest).execute().data[0]
         item_data = supabase.table("item").select("*").eq("id", item).execute().data[0]
         if guest_data["event"] == item_data["event"]:

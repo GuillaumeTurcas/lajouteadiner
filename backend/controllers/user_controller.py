@@ -56,6 +56,7 @@ class UserList(Resource):
         """Create a new user."""
         data = request.json
         admin = 0
+        print(admin)
         if "admin" in session:
             if data["admin"] <= session["admin"]:
                 admin = data["admin"]
@@ -86,6 +87,11 @@ class User(Resource):
         if "admin" in data:
             if data["admin"] > session["admin"]:
                 return {"error": "No authorization to make an admin"}
+        control_list = ["salt", "token", "password", "id"]
+        for control in control_list:
+            if control in data:
+                if session["admin"] != 2:
+                    return {"error": f"No authorization to change {control}"}
         user = update_user(user_id, data)
         return jsonify(user)
 

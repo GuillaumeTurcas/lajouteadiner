@@ -54,7 +54,7 @@ def get_event(event_id):
     """
     try:
         response = supabase.table("event").select("*").eq("id", event_id).execute()
-        return response.data
+        return response.data[0]
     except Exception as e:
         return {"error": f"Error retrieving event: {e}"}
 
