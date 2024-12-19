@@ -128,7 +128,7 @@ class Login(Resource):
         data = request.json
         user = login_user(data["login"], data["password"])
         if user is not None:
-            print(f"{user["surname"]} {user["name"]} est connecté")
+            print(f'{user["surname"]} {user["name"]} est connecté')
             session["logged_in"] = True
             session["user"] = user["id"]
             session["login"] = user["login"]

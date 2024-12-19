@@ -1,8 +1,11 @@
 # Environnement virtuel
 venv/
 .env/
+.venv/
 *.env
 *.cfg
+.env
+.env.*
 
 # Fichiers de configuration spécifiques
 __pycache__/
@@ -50,3 +53,18 @@ bin/
 lib/
 include/
 lajouteadiner/
+
+# Node Modules
+frontend/node_modules
+
+# Frontend Output
+frontend/.output
+frontend/.vercel
+frontend/.netlify
+frontend/.wrangler
+frontend/.svelte-kit
+frontend/build
+
+# Vite
+frontend/vite.config.js.timestamp-*
+frontend/vite.config.ts.timestamp-*
