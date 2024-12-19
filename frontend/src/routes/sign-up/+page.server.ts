@@ -1,35 +1,41 @@
 import { type Cookies, type Actions, redirect, fail } from '@sveltejs/kit';
-import { BACKEND_URL, COOKIE_PATH } from "$env/static/private";
+import { BACKEND_URL, COOKIES_AGE_DAY } from "$env/static/private";
 
 export const actions = {
 	signup: async ({ cookies, request }: { cookies: Cookies; request: Request }) => {
 		const data = await request.formData();
+        const name = data.get('name');
+        const surname = data.get('surname');
 		const login = data.get('login');
+        const admin = 0;
 		const password = data.get('password');
 
-        if (!login || !password) {
-			return fail(400, { incorrect: true, login, message: "Both fields are required." });
+        if (!login || !password || !name || !surname) {
+			return fail(400, { incorrect: true, login, name, surname, message: "All fields are required." });
 		}
     
-        const response = await fetch(`${BACKEND_URL}/users/login`, {
+        const response = await fetch(`${BACKEND_URL}/users`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ login, password }),
+            body: JSON.stringify({ name, surname, login, password, admin }),
         });
 
         if (!response.ok) {
-			return fail(400, { incorrect: true, login, message: "Invalid credentials!" });
+			return fail(400, { incorrect: true, login, name, surname, message: "Something has gone wrong!" });
 		}
 
-        const user = await response.json();
+        const id = (await response.json())?.id;
+        const setCookieHeader = await response.headers.get('set-cookie');
 
-        if (!user?.token) {
-			return fail(400, { incorrect: true, login, message: "Invalid credentials!" });
+        if (!setCookieHeader || !id) {
+			return fail(400, { incorrect: true, login, name, surname, message: "Something has gone wrong!" });
 		}
 
-        cookies.set('token', user.token, { path: `/${COOKIE_PATH}` });
+        const cookieAgeDay: number = Number(COOKIES_AGE_DAY);
+        cookies.set('session', setCookieHeader.split("session=")[1].split(";")[0], { path: '/', maxAge: 60 * 60 * 24 * cookieAgeDay });
+        cookies.set('user_id', id, { path: '/', maxAge: 60 * 60 * 24 * cookieAgeDay });
         return redirect(303, '/home');
 	},
 } satisfies Actions;
