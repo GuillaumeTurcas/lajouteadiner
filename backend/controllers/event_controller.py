@@ -34,9 +34,11 @@ class EventList(Resource):
     def post(self):
         """Create a new event"""
         try:
+            verify_jwt_in_request()  # Vérifie que le JWT est valide
+            current_user = json.loads(get_jwt_identity())
             data = request.json
             if "organizer" in data:
-                if session["user"] != data["organizer"] and session["admin"] < 1:
+                if current_user["user_id"] != data["organizer"] and current_user["admin"] < 1:
                     return {"error": "You don't have the permission"}
             event = create_event(data["event"], data["date"], data["deadline"], data["place"], data["organizer"])
             return jsonify(event)
@@ -70,17 +72,20 @@ class Event(Resource):
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
 
-    @event_ns.doc("list_event")
+    @event_ns.doc("list_event_by_id")
     @login_required
     @admin_or_guests_required
     def get(self, event_id):
-        """List an event"""
+        """List an event with his id"""
         try:
             events = get_event(event_id)
             return jsonify(events)
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
 
+@event_ns.route("/guests/<int:event_id>")
+@event_ns.param("event_id", "The event identifier")
+class GuestsEvent(Resource):
     @event_ns.doc("list_guest_event")
     @login_required
     @admin_or_guests_required

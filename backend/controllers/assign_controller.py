@@ -34,13 +34,16 @@ class AssignList(Resource):
         """Create a new assignment"""
         try:
             data = request.json
+            verify_jwt_in_request()  # Vérifie que le JWT est valide
+            current_user = json.loads(get_jwt_identity())
+            
             if "item" in data:
                 guest_list = get_guests_event(get_item(data["item"]).get("event"))
                 is_guest = False
                 for guest in guest_list:
-                    if guest["user"] == session["user"]:
+                    if guest["user"] == current_user["user_id"]:
                         is_guest = True
-                if is_guest or session["admin"] >= 1:
+                if is_guest or current_user["admin"] >= 1:
                     assign = create_assign(data["guest"], data["item"], data["quantity"]) if authorize(data) else None
                 else:
                     return jsonify({"error": "You are not a guest or an admin to add an assign"})

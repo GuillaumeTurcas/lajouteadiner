@@ -41,7 +41,7 @@ def get_events():
     :return: Liste des événements ou message d'erreur en cas d'erreur
     """
     try:
-        response = supabase.table("event").select("*").execute()
+        response = supabase.table("event").select("*, organizer!inner(id, name, surname)").execute()
         return response.data
     except Exception as e:
         return {"error": f"Error retrieving event: {e}"}
@@ -55,7 +55,7 @@ def get_event(event_id):
     :return: Données de l'événement ou message d'erreur en cas d'erreur
     """
     try:
-        response = supabase.table("event").select("*").eq("id", event_id).execute()
+        response = supabase.table("event").select("*, organizer!inner(id, name, surname)").eq("id", event_id).execute()
         return response.data[0]
     except Exception as e:
         return {"error": f"Error retrieving event: {e}"}

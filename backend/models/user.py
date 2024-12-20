@@ -25,13 +25,13 @@ def create_user(name, surname, login, password, admin):
         is_login_exist = supabase.table("user") \
             .select("*") \
             .eq("login", login) \
-            .execute() 
+            .execute().data 
         if is_login_exist:
             return {
                 "create_user": False,
                 "reason": "login already exist"
             }
-        if len(password) < 8 or len(login_user) < 4:
+        if len(password) < 8 or len(login) < 4:
             return {
                 "create_user": False,
                 "reason": "not enough character for login or password"

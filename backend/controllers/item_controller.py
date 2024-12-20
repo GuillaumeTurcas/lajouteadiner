@@ -38,11 +38,15 @@ class ItemList(Resource):
     def post(self): 
         """Create a new item"""
         try:
+
             data = request.json
+            verify_jwt_in_request()  # Vérifie que le JWT est valide
+            current_user = json.loads(get_jwt_identity())
+            
             if "event" in data:
                 if get_event(data["event"]) \
-                    .get("organizer") == session["user"] \
-                    or session["admin"] >= 1:
+                    .get("organizer") == current_user["user_id"] \
+                    or current_user["admin"] >= 1:
                     item = create_item(data["name"], \
                         data["quantity"], data["description"], \
                         data["event"])
