@@ -22,17 +22,15 @@ export const actions = {
         if (!response.ok) {
 			return fail(400, { incorrect: true, login, message: "Something has gone wrong!" });
 		}
-
-        const id = (await response.json())?.id;
+        
         const setCookieHeader = await response.headers.get('set-cookie');
 
-        if (!setCookieHeader || !id) {
+        if (!setCookieHeader) {
 			return fail(400, { incorrect: true, login, message: "Invalid credentials!" });
 		}
 
         const cookieAgeDay: number = Number(COOKIES_AGE_DAY);
-        cookies.set('session', setCookieHeader.split("session=")[1].split(";")[0], { path: '/', maxAge: 60 * 60 * 24 * cookieAgeDay });
-        cookies.set('user_id', id, { path: '/', maxAge: 60 * 60 * 24 * cookieAgeDay });
+        cookies.set('access_token_cookie', setCookieHeader.split("access_token_cookie=")[1].split(";")[0], { path: '/', maxAge: 60 * 60 * 24 * cookieAgeDay });
         return redirect(303, '/home');
 	},
 } satisfies Actions;

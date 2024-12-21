@@ -2,8 +2,8 @@
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-	console.log(data);
 	const upcoming = data.event?.upcoming;
+	const users = data.event?.users;
 
 	function formatDate(dateStr: string): string {
 		const date = new Date(dateStr);
@@ -16,6 +16,10 @@
 
 		return `${day}/${month}/${year} à ${hours}h${minutes}`;
 	}
+
+	function capitalizeFirstLetter(str: string) {
+		return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+	}
 </script>
 
 <div class="container-fluid p-3 mx-auto col-4">
@@ -26,11 +30,20 @@
 				<div class="card shadow-sm text-center">
 					<div class="card-body">
 						<h5 class="card-title">{event.event}</h5>
-						<p class="card-text mb-1">
+						<p class="card-text mb-0">
 							<strong>Date:</strong> {formatDate(event.date)}
 						</p>
-						<p class="card-text">
+						<p class="card-text mb-0">
 							<strong>Place:</strong> {event.place}
+						</p>
+						<p class="card-text mb-0">
+							<strong>Organizer:</strong> {users[event.organizer].name} {users[event.organizer].surname}
+						</p>
+						<p class="card-text mb-0">
+							<strong>Guest{#if event.guest.length > 1}s{/if}:</strong>
+							{#each event.guest as user}
+								<span class="badge bg-primary me-1">{capitalizeFirstLetter(users[user.user].name)} {capitalizeFirstLetter(users[user.user].surname)}</span>
+							{/each}
 						</p>
 					</div>
 				</div>
@@ -44,12 +57,22 @@
 				<div class="card shadow-sm text-center">
 					<div class="card-body">
 						<h5 class="card-title">{event.event}</h5>
-						<p class="card-text mb-1">
+						<p class="card-text mb-0">
 							<strong>Date:</strong> {formatDate(event.date)}
 						</p>
-						<p class="card-text">
+						<p class="card-text mb-0">
 							<strong>Place:</strong> {event.place}
 						</p>
+						<p class="card-text mb-0">
+							<strong>Organizer:</strong> {users[event.organizer].name} {users[event.organizer].surname}
+						</p>
+						<p class="card-text">
+							<strong>Guest{#if event.guest.length > 1}s{/if}:</strong>
+							{#each event.guest as user}
+								<span class="badge bg-primary me-1">{capitalizeFirstLetter(users[user.user].name)} {capitalizeFirstLetter(users[user.user].surname)}</span>
+							{/each}
+						</p>
+
 					</div>
 				</div>
 			</div>
