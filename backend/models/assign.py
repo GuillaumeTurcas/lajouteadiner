@@ -127,3 +127,20 @@ def verif_quantity(item_id, quantity_assign):
         return quantity_assign > quantity
     except Exception as e:
         return {"error": f"Error verifying quantity: {e}"}
+
+
+def get_full_items_for_a_guest(guest_id):
+    """
+    Récupère tous les assign détaillés associés à un guest spécifique.
+
+    :param event_id: ID du guest
+    :return: Liste des items du guest ou message d'erreur en cas d'erreur
+    """
+    try:
+        response =  supabase.table("assign") \
+            .select("*, guest!inner(id, event, user!inner(id, name, surname)), item!inner(*))") \
+            .eq("guest", guest_id) \
+            .execute()
+        return response.data
+    except Exception as e:
+        return {"error": f"Error retrieving items for event: {e}"}

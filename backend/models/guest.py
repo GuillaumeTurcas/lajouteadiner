@@ -120,3 +120,18 @@ def items_for_a_guest(guest_id):
         return response
     except Exception as e:
         return {"error": f"Error retrieving items for guest: {e}"}
+
+
+def get_full_all_guest(user_id):
+    """
+    Récupère tous les événements liés à un utilisateur spécifique.
+
+    :param user_id: ID de l'utilisateur
+    :return: Liste des tous les évènement auquel participe un utilisateur
+    """
+    try:
+        response = supabase.table("guest").select("*, event!inner(*), user!inner(id, name, surname, login)") \
+            .eq("user", user_id).execute()
+        return response.data
+    except Exception as e:
+        return {"error": f"Error by retrieving guests for user: {e}"}

@@ -90,3 +90,18 @@ class Assign(Resource):
             return jsonify({"message": "Assign deleted"})
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
+
+
+@assign_ns.route("/get_full_items_for_a_guest/<int:guest_id>")
+@assign_ns.param("guest_id", "The guest identifier")
+class FullItemsForAGuest(Resource):
+    @assign_ns.doc("get_assign") 
+    @login_required
+    @admin_or_guests_required
+    def get(self, guest_id): 
+        """Get an assignment by ID"""
+        try:
+            assign = get_full_items_for_a_guest(guest_id)
+            return jsonify(assign)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})

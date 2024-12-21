@@ -122,3 +122,4 @@ def get_items_event(event_id):
         return response.data
     except Exception as e:
         return {"error": f"Error retrieving items for event: {e}"}
+

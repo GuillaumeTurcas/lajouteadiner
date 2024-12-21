@@ -173,3 +173,5 @@ def get_events_user(user_id):
         return response.data
     except Exception as e:
         return {"error": f"Error retrieving events for user: {e}"}
+
+

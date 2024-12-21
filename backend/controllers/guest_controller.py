@@ -125,3 +125,18 @@ class Assign(Resource):
             return jsonify(items)
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
+
+
+@guest_ns.route("/all_guest/<int:user_id>") 
+@guest_ns.param("user_id", "The user identifier") 
+class AllGuest(Resource):
+    @guest_ns.doc("get_full_all_guest")
+    @login_required
+    @admin_or_owner_required
+    def get(self, user_id):
+        """Get a guest by ID"""
+        try:
+            response = get_full_all_guest(user_id)
+            return jsonify(response)
+        except Exception as e:
+            return jsonify({"error": f"Error: {e}"})
