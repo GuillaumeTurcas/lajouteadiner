@@ -23,7 +23,7 @@
 </script>
 
 <div class="container-fluid p-3 mx-auto col-sm-4">
-	<h2 class="text-center">Upcoming Events</h2>
+	<h2 class="text-center mb-3">Upcoming Events</h2>
 	<div class="row g-3">
 		{#each upcoming as event}
 			<div class="col-12">
@@ -48,9 +48,6 @@
 						<p class="card-text mb-3">
 							<strong>Status:</strong> {event.menu}
 						</p>
-						<form method="post" class="d-flex justify-content-center">
-							<button class="btn btn-primary" formaction="/?/event/{event.id}" type="submit">View</button>
-						</form>
 					</div>
 				</div>
 			</div>

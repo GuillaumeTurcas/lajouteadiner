@@ -60,8 +60,6 @@ export const actions = {
             }
         }
 
-        console.log(oldPassword, newPassword1, newPassword2, user_id);
-
         const responseChangePassword = await fetch(`${BACKEND_URL}/users/change_password/${user_id}`, {
             method: "PUT",
             headers: {
