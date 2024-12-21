@@ -19,10 +19,16 @@ export const load = async ({ cookies, url }: { cookies: any; url: any }) => {
         throw redirect(307, "/login");
     }
 
-    const is_logged_in = (await response.json()).is_login;
+    const responseLogin = await response.json();
+    const is_logged_in = responseLogin.is_login;
 
     if (is_logged_in && (url.pathname === "/login" || url.pathname === "/sign-up" || url.pathname === "/")) {
         throw redirect(307, "/home");
+    }
+
+    if (!is_logged_in && url.pathname !== "/login" && url.pathname !== "/sign-up") {
+        cookies.delete("access_token_cookie", { path: "/" });
+        throw redirect(307, "/login");
     }
 
     return { is_logged_in };
