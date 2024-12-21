@@ -17,7 +17,7 @@
                     <h2 class="text-center">Profile</h2>
                     <h5 class="card-title">{user.name} {user.surname}</h5>
                     <p class="card-text mb-0">Identifier: {user.login}</p>
-                    <p class="card-text">Admin Status: Niveau {user.admin}</p>
+                    <p class="card-text">Admin Status: Level {user.admin}</p>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
                             placeholder="Confirm your new password" autocomplete="new-password" 
                             class:is-valid={passwordMatch} class:is-invalid={!passwordMatch} required>
                         </div>
-                        <button type="submit" class="btn btn-primary d-block mx-auto mb-3" disabled={!passwordMatch}>CHANGE PASSWORD</button>
+                        <button type="submit" class="btn btn-primary d-block mx-auto" disabled={!passwordMatch}>CHANGE PASSWORD</button>
                     </form>
                     {#if form?.message}
                         <p class="text-center text-danger">{form.message}</p>
