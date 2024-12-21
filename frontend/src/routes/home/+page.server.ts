@@ -1,7 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { BACKEND_URL } from "$env/static/private";
 import jwt from 'jsonwebtoken';
-
 export const load: PageServerLoad = async ({ cookies }) => {
 	const session = cookies.get('access_token_cookie');
 	let user_id = null;
@@ -12,26 +11,26 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		}
 	}
 
-	const responseUpcoming = await fetch(`${BACKEND_URL}/events/upcoming/${user_id}`, {
-		method: 'GET',
-		headers: {
-			'Cookie': `access_token_cookie=${session}`
-		}
-	});
-
-	const responseAll = await fetch(`${BACKEND_URL}/events/user/${user_id}`, {
-		method: 'GET',
-		headers: {
-			'Cookie': `access_token_cookie=${session}`
-		}
-	});
-
-	const responseUser = await fetch(`${BACKEND_URL}/users/`, {
-		method: 'GET',
-		headers: {
-			'Cookie': `access_token_cookie=${session}`
-		}
-	});
+	const [responseUpcoming, responseAll, responseUser] = await Promise.all([
+		fetch(`${BACKEND_URL}/events/upcoming/${user_id}`, {
+			method: 'GET',
+			headers: {
+				'Cookie': `access_token_cookie=${session}`
+			}
+		}),
+		fetch(`${BACKEND_URL}/events/user/${user_id}`, {
+			method: 'GET',
+			headers: {
+				'Cookie': `access_token_cookie=${session}`
+			}
+		}),
+		fetch(`${BACKEND_URL}/users/`, {
+			method: 'GET',
+			headers: {
+				'Cookie': `access_token_cookie=${session}`
+			}
+		})
+	]);
 
 	if (!responseUpcoming.ok || !responseAll.ok || !responseUser.ok) {
 		return {
@@ -40,10 +39,12 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		};
 	}
 
-	const upcoming = await responseUpcoming.json();
-	const all = await responseAll.json();
-	const users = await responseUser.json();
-	
+	const [upcoming, all, users] = await Promise.all([
+		responseUpcoming.json(),
+		responseAll.json(),
+		responseUser.json()
+	]);
+
 	interface User {
 		id: number;
 		name: string;
@@ -54,10 +55,9 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		acc[item.id] = item;
 		return acc;
 	}, {} as Record<number, User>);
-	
 
 	return {
-		event:{
+		event: {
 			upcoming: upcoming,
 			past: all.filter((event: { date: string }) => (event.date < new Date().toISOString())),
 			users: usersDict

@@ -6,7 +6,7 @@
     let { form }: { form: ActionData } = $props();
 </script>
 
-<div class="container p-3 mx-auto col-4">
+<div class="container p-3 mx-auto col-sm-4">
     <div class="mb-3">
         <p class="text-center">Sign Up to continue</p>
     </div>
