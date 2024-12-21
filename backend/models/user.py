@@ -118,6 +118,12 @@ def update_user(user_id, update_data):
     try:
         if "password" in update_data:
             del update_data["password"]
+        if "login" in update_data:
+            if len(update_data["login"]) < 4:
+                return {
+                    "update_user": False,
+                    "reason": "not enough character for login"
+                }
         response = (
             supabase.table("user")
             .update(update_data)
@@ -173,6 +179,11 @@ def change_password(user_id, old_password, new_password):
     :return: True si le mot de passe a été changé, sinon False
     """
     try:
+        if len(new_password) < 8:
+            return {
+                "create_user": False,
+                "reason": "not enough character for the new password"
+                }
         response = supabase.table("user").select("*").eq("id", user_id).execute()
         if response.data:
             user = response.data[0]
