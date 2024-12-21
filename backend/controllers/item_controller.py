@@ -1,5 +1,8 @@
 from flask import jsonify, request
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import (JWTManager, create_access_token, 
+    create_refresh_token, jwt_required, get_jwt_identity, 
+    get_csrf_token, verify_jwt_in_request)
 from models.item import *
 from models.event import *
 from auth import *
@@ -38,11 +41,9 @@ class ItemList(Resource):
     def post(self): 
         """Create a new item"""
         try:
-
             data = request.json
-            verify_jwt_in_request()  # Vérifie que le JWT est valide
+            verify_jwt_in_request()
             current_user = json.loads(get_jwt_identity())
-            
             if "event" in data:
                 if get_event(data["event"]) \
                     .get("organizer") == current_user["user_id"] \

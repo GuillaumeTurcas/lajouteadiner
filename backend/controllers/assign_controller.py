@@ -1,5 +1,8 @@
 from flask import jsonify, request
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import (JWTManager, create_access_token, 
+    create_refresh_token, jwt_required, get_jwt_identity, 
+    get_csrf_token, verify_jwt_in_request)
 from models.assign import *
 from auth import *
 import json
@@ -34,9 +37,8 @@ class AssignList(Resource):
         """Create a new assignment"""
         try:
             data = request.json
-            verify_jwt_in_request()  # Vérifie que le JWT est valide
-            current_user = json.loads(get_jwt_identity())
-            
+            verify_jwt_in_request() 
+            current_user = json.loads(get_jwt_identity())   
             if "item" in data:
                 guest_list = get_guests_event(get_item(data["item"]).get("event"))
                 is_guest = False

@@ -1,7 +1,8 @@
 from flask import jsonify, request, make_response
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import (JWTManager, create_access_token, 
-    create_refresh_token, jwt_required, get_jwt_identity, get_csrf_token, verify_jwt_in_request)
+    create_refresh_token, jwt_required, get_jwt_identity, 
+    get_csrf_token, verify_jwt_in_request)
 from models.user import (
     get_users, create_user, get_user, get_full_user, login_user,
     update_user, delete_user, change_password, reset_password
@@ -10,7 +11,7 @@ from auth import *
 from datetime import datetime, timedelta
 import pytz
 from json import dumps
-from config import limit_session, BLOCKLIST
+from config import limit_session
 
 # Initialisation du namespace RESTX
 user_ns = Namespace("users", description="User related operations")
@@ -58,16 +59,15 @@ class UserList(Resource):
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
 
-    @user_ns.expect(user_model)####################
+    @user_ns.expect(user_model)
     @user_ns.doc("add_user")
     def post(self):
         """Create a new user."""
         try:
             data = request.json
             admin = 0
-            # Vérifie que le JWT est valide
             verify_jwt_in_request()
-            current_user = get_jwt_identity()  # Récupérer l'identité de l'utilisateur depuis le JWT
+            current_user = get_jwt_identity() 
 
             if current_user:
                 current_user = json.loads(get_jwt_identity())
@@ -77,7 +77,7 @@ class UserList(Resource):
                 if "admin" in current_user:
                     if data["admin"] <= current_user["admin"]:
                         admin = data["admin"]
-            print(data)
+
             user = create_user(
                 data["name"], data["surname"],
                 data["login"], data["password"], admin
@@ -100,7 +100,7 @@ class User(Resource):
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
 
-    @user_ns.expect(edit_user_model)##############
+    @user_ns.expect(edit_user_model)
     @user_ns.doc("modify_user")
     @login_required
     @admin_or_owner_required
@@ -109,8 +109,8 @@ class User(Resource):
         """Update a user by ID."""
         try:
             data = request.json
-            verify_jwt_in_request()  # Vérifie que le JWT est valide
-            current_user = get_jwt_identity()  # Récupérer l'identité de l'utilisateur depuis le JWT
+            verify_jwt_in_request() 
+            current_user = get_jwt_identity()  
 
             if current_user:
                 current_user = json.loads(get_jwt_identity())
@@ -122,6 +122,7 @@ class User(Resource):
                 if control in data:
                     if current_user["admin"] != 2:
                         return {"error": f"No authorization to change {control}"}
+
             user = update_user(user_id, data)
             return jsonify(user)
         except Exception as e:
@@ -225,20 +226,17 @@ class Logout(Resource):
     def post(self):
         """Logout a user by invalidating the JWT and optionally removing the cookie."""
         try:
-            # Générer un nouveau token avec logged_in=False
             new_token = create_access_token(
                 identity=dumps({  # Sérialiser en JSON
                     "logged_in": False
                 })
             )
 
-            # Créer une réponse et ajouter le JWT dans un cookie
             response = make_response(jsonify({"message": "Logged out successfully"}))
             response.set_cookie("access_token_cookie", new_token, httponly=True)
             response.set_cookie("csrf_access_token", "") 
 
             return response
-
         except Exception as e:
             return jsonify({"error": f"Error: {e}"})
 
